@@ -8,12 +8,25 @@ import mate.academy.internetshop.dao.impl.BucketDaoImpl;
 import mate.academy.internetshop.dao.impl.ItemDaoImpl;
 import mate.academy.internetshop.dao.impl.OrderDaoImpl;
 import mate.academy.internetshop.dao.impl.UserDaoImpl;
+import mate.academy.internetshop.model.Item;
+import mate.academy.internetshop.service.BucketService;
+import mate.academy.internetshop.service.ItemService;
+import mate.academy.internetshop.service.OrderService;
+import mate.academy.internetshop.service.UserService;
+import mate.academy.internetshop.service.impl.BucketServiceImpl;
+import mate.academy.internetshop.service.impl.ItemServiceImpl;
+import mate.academy.internetshop.service.impl.OrderServiceImpl;
+import mate.academy.internetshop.service.impl.UserServiceImpl;
 
 public class Factory {
     private static UserDao userDaoInstance;
     private static BucketDao bucketDaoInstance;
     private static ItemDao itemDaoInstance;
     private static OrderDao orderDaoInstance;
+    private static OrderService orderServiceInstance;
+    private static UserService userServiceInstance;
+    private static ItemService itemServiceInstance;
+    private static BucketService bucketServiceInstance;
 
     public static UserDao getUserDao() {
         if (userDaoInstance == null) {
@@ -42,4 +55,33 @@ public class Factory {
         }
         return orderDaoInstance;
     }
+
+    public static OrderService getOrderService() {
+        if (orderServiceInstance == null) {
+            orderServiceInstance = new OrderServiceImpl();
+        }
+        return orderServiceInstance;
+    }
+
+    public static UserService getUserService() {
+        if (userServiceInstance == null) {
+            userServiceInstance = new UserServiceImpl();
+        }
+        return userServiceInstance;
+    }
+
+    public static ItemService getItemService() {
+        if (itemServiceInstance == null) {
+            itemServiceInstance = new ItemServiceImpl();
+        }
+        return itemServiceInstance;
+    }
+
+    public static BucketService getBucketService() {
+        if (bucketServiceInstance == null) {
+            bucketServiceInstance = new BucketServiceImpl();
+        }
+        return bucketServiceInstance;
+    }
+
 }
