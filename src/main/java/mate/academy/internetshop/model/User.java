@@ -5,7 +5,6 @@ public class User {
     private Long userId;
 
     public User(String name) {
-        userId = GeneratorId.getNewUserId();
         this.name = name;
     }
 

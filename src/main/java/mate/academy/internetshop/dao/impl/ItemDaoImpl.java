@@ -7,14 +7,17 @@ import java.util.Optional;
 import mate.academy.internetshop.dao.ItemDao;
 import mate.academy.internetshop.db.Storage;
 import mate.academy.internetshop.lib.Dao;
+import mate.academy.internetshop.model.GeneratorId;
 import mate.academy.internetshop.model.Item;
 
 @Dao
 public class ItemDaoImpl implements ItemDao {
     @Override
     public Item create(Item item) {
-        Storage.items.add(item);
-        return item;
+        Item tempItem = item;
+        tempItem.setItemId(GeneratorId.getNewItemId());
+        Storage.items.add(tempItem);
+        return tempItem;
     }
 
     @Override
@@ -36,16 +39,12 @@ public class ItemDaoImpl implements ItemDao {
             }
             itemPos++;
         }
-        if (itemPos >= Storage.items.size()) {
-            Storage.items.add(item);
-        } else {
-            Storage.items.set(itemPos, item);
-        }
+        Storage.items.set(itemPos, item);
         return item;
     }
 
     @Override
-    public boolean delete(Long itemId) {
+    public boolean deleteById(Long itemId) {
         Optional optionalItem = Optional.ofNullable(Storage.items
                 .stream()
                 .filter(i -> i.getItemId().equals(itemId))
@@ -58,7 +57,7 @@ public class ItemDaoImpl implements ItemDao {
     }
 
     @Override
-    public boolean deleteById(Item item) {
+    public boolean delete(Item item) {
         return Storage.items.remove(item);
     }
 

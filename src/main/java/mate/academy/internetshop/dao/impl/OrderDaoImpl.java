@@ -7,14 +7,17 @@ import java.util.Optional;
 import mate.academy.internetshop.dao.OrderDao;
 import mate.academy.internetshop.db.Storage;
 import mate.academy.internetshop.lib.Dao;
+import mate.academy.internetshop.model.GeneratorId;
 import mate.academy.internetshop.model.Order;
 
 @Dao
 public class OrderDaoImpl implements OrderDao {
     @Override
     public Order create(Order order) {
-        Storage.orders.add(order);
-        return order;
+        Order tempOrder = order;
+        tempOrder.setOrderId(GeneratorId.getNewOrderId());
+        Storage.orders.add(tempOrder);
+        return tempOrder;
     }
 
     @Override
@@ -37,11 +40,7 @@ public class OrderDaoImpl implements OrderDao {
             }
             orderPos++;
         }
-        if (orderPos >= Storage.orders.size()) {
-            Storage.orders.add(order);
-        } else {
-            Storage.orders.set(orderPos, order);
-        }
+        Storage.orders.set(orderPos, order);
         return order;
     }
 

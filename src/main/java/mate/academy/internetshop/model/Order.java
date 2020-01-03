@@ -10,7 +10,6 @@ public class Order {
     private List<Item> items;
 
     public Order(List<Item> items, Long userId) {
-        orderId = GeneratorId.getNewOrderId();
         this.items = items;
         this.amount = countAmoutn(items);
         this.userId = userId;

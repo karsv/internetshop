@@ -8,13 +8,16 @@ import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.db.Storage;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Bucket;
+import mate.academy.internetshop.model.GeneratorId;
 
 @Dao
 public class BucketDaoImpl implements BucketDao {
     @Override
     public Bucket create(Bucket bucket) {
-        Storage.buckets.add(bucket);
-        return bucket;
+        Bucket tempBucket = bucket;
+        tempBucket.setBucketId(GeneratorId.getNewBucketId());
+        Storage.buckets.add(tempBucket);
+        return tempBucket;
     }
 
     @Override
@@ -42,25 +45,21 @@ public class BucketDaoImpl implements BucketDao {
             }
             bucketPos++;
         }
-        if (bucketPos >= Storage.buckets.size()) {
-            Storage.buckets.add(bucket);
-        } else {
-            Storage.buckets.set(bucketPos, bucket);
-        }
+        Storage.buckets.set(bucketPos, bucket);
         return bucket;
     }
 
     @Override
     public boolean deleteById(Long bucketId) {
-        Optional optionalBucket = Optional.ofNullable(Storage.buckets
+        Optional<Bucket> optionalBucket = Optional.ofNullable(Storage.buckets
                 .stream()
                 .filter(i -> i.getBucketId().equals(bucketId))
-                .findFirst());
-        if (optionalBucket.isEmpty()) {
-            return false;
+                .findFirst().get());
+        if (optionalBucket.isPresent()) {
+            Storage.buckets.remove(optionalBucket.get());
+            return true;
         }
-        Storage.buckets.remove(optionalBucket.get());
-        return true;
+        return false;
     }
 
     @Override

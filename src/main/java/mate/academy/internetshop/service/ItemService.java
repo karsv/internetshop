@@ -14,7 +14,7 @@ public interface ItemService {
 
     List getAllItems();
 
-    boolean delete(Long itemId);
+    boolean deleteById(Long itemId);
 
     boolean delete(Item item);
 }

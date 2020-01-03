@@ -4,12 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bucket {
+    private Long userId;
     private Long bucketId;
     private List<Item> items;
 
     public Bucket() {
-        bucketId = GeneratorId.getNewBucketId();
         items = new ArrayList<>();
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setBucketId(Long bucketId) {
+        this.bucketId = bucketId;
     }
 
     public Long getBucketId() {
@@ -25,6 +37,8 @@ public class Bucket {
         return "Bucket{"
                 + "bucketId="
                 + bucketId
+                + "userId="
+                + userId
                 + ", items="
                 + items
                 + '}';

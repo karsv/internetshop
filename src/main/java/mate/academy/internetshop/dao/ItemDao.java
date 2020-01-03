@@ -12,9 +12,9 @@ public interface ItemDao {
 
     Item update(Item item);
 
-    boolean delete(Long itemId);
+    boolean deleteById(Long itemId);
 
-    boolean deleteById(Item item);
+    boolean delete(Item item);
 
     List<Item> getAllItems();
 }

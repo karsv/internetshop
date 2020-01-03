@@ -36,12 +36,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public boolean delete(Long itemId) {
-        return itemDao.delete(itemId);
+    public boolean deleteById(Long itemId) {
+        return itemDao.deleteById(itemId);
     }
 
     @Override
     public boolean delete(Item item) {
-        return itemDao.deleteById(item);
+        return itemDao.delete(item);
     }
 }

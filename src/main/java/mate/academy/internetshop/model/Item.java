@@ -11,7 +11,6 @@ public class Item {
     public Item(String name, double price) {
         this.name = name;
         this.price = BigDecimal.valueOf(price);
-        itemId = GeneratorId.getNewItemId();
     }
 
     public Long getItemId() {

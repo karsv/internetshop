@@ -46,10 +46,10 @@ public class Main {
         Item item1 = new Item("Item 1", 1.0);
         Item item2 = new Item("Item 2", 2.0);
         Item item3 = new Item("Item 3", 3.0);
-        System.out.println(Storage.items);
         itemService.create(item1);
         itemService.create(item2);
         itemService.create(item3);
+        System.out.println(Storage.items);
         bucketService.addItem(bucket, item1);
         bucketService.addItem(bucket, item2);
         bucketService.addItem(bucket, item3);

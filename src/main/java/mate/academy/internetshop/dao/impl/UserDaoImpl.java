@@ -6,14 +6,17 @@ import java.util.Optional;
 import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.db.Storage;
 import mate.academy.internetshop.lib.Dao;
+import mate.academy.internetshop.model.GeneratorId;
 import mate.academy.internetshop.model.User;
 
 @Dao
 public class UserDaoImpl implements UserDao {
     @Override
     public User create(User user) {
-        Storage.users.add(user);
-        return user;
+        User tempUser = user;
+        tempUser.setUserId(GeneratorId.getNewUserId());
+        Storage.users.add(tempUser);
+        return tempUser;
     }
 
     @Override
@@ -36,11 +39,7 @@ public class UserDaoImpl implements UserDao {
             }
             userPos++;
         }
-        if (userPos >= Storage.users.size()) {
-            Storage.users.add(user);
-        } else {
-            Storage.users.set(userPos, user);
-        }
+        Storage.users.set(userPos, user);
         return user;
     }
 
