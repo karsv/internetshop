@@ -29,32 +29,36 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User update(User user) {
-        Optional oldUser = Optional.ofNullable(Storage.users.stream()
-                .filter(i -> i.getUserId().equals(user.getUserId()))
-                .findFirst());
-        Storage.users.remove(oldUser.get());
-        Storage.users.add(user);
+        int userPos = 0;
+        for (User u : Storage.users) {
+            if (u.getUserId().equals(user.getUserId())) {
+                break;
+            }
+            userPos++;
+        }
+        if (userPos >= Storage.users.size()) {
+            Storage.users.add(user);
+        } else {
+            Storage.users.set(userPos, user);
+        }
         return user;
     }
 
     @Override
-    public boolean delete(Long userId) {
+    public boolean deleteById(Long userId) {
         Optional optionalUser = Optional.ofNullable(Storage.users
                 .stream()
                 .filter(i -> i.getUserId().equals(userId))
-                .findFirst())
-                .orElseThrow(() -> new NoSuchElementException("Can't find user with id: "
-                        + userId));
+                .findFirst());
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
         Storage.users.remove(optionalUser.get());
         return true;
     }
 
     @Override
     public boolean delete(User user) {
-        if (!Storage.users.remove(user)) {
-            throw new NoSuchElementException("Can't find user with id: "
-                    + user.getUserId());
-        }
-        return true;
+        return Storage.users.remove(user);
     }
 }

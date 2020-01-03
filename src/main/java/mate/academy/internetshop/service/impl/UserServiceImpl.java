@@ -16,8 +16,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        userDao.create(user);
-        return user;
+        return userDao.create(user);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean delete(Long userId) {
-        return userDao.delete(userId);
+        return userDao.deleteById(userId);
     }
 
     @Override

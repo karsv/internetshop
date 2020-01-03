@@ -14,7 +14,7 @@ public interface ItemDao {
 
     boolean delete(Long itemId);
 
-    boolean delete(Item item);
+    boolean deleteById(Item item);
 
     List<Item> getAllItems();
 }

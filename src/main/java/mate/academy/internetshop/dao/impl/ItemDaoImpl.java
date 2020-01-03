@@ -29,33 +29,37 @@ public class ItemDaoImpl implements ItemDao {
 
     @Override
     public Item update(Item item) {
-        Optional oldItem = Optional.ofNullable(Storage.items.stream()
-                .filter(i -> i.getItemId().equals(item.getItemId()))
-                .findFirst());
-        Storage.items.remove(oldItem.get());
-        Storage.items.add(item);
+        int itemPos = 0;
+        for (Item i : Storage.items) {
+            if (i.getItemId().equals(item.getItemId())) {
+                break;
+            }
+            itemPos++;
+        }
+        if (itemPos >= Storage.items.size()) {
+            Storage.items.add(item);
+        } else {
+            Storage.items.set(itemPos, item);
+        }
         return item;
     }
 
     @Override
     public boolean delete(Long itemId) {
-        Optional optionalItemitem = Optional.ofNullable(Storage.items
+        Optional optionalItem = Optional.ofNullable(Storage.items
                 .stream()
                 .filter(i -> i.getItemId().equals(itemId))
-                .findFirst())
-                .orElseThrow(() -> new NoSuchElementException("Can't find item with id: "
-                        + itemId));
-        Storage.items.remove(optionalItemitem.get());
+                .findFirst());
+        if (optionalItem.isEmpty()) {
+            return false;
+        }
+        Storage.items.remove(optionalItem.get());
         return true;
     }
 
     @Override
-    public boolean delete(Item item) {
-        if (!Storage.items.remove(item)) {
-            throw new NoSuchElementException("Can't find such item: "
-                    + item.getName());
-        }
-        return true;
+    public boolean deleteById(Item item) {
+        return Storage.items.remove(item);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package mate.academy.internetshop.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +20,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order create(Order order) {
-        orderDao.create(order);
-        return order;
+        return orderDao.create(order);
     }
 
     @Override
@@ -37,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean delete(Long orderId) {
-        return orderDao.delete(orderId);
+        return orderDao.deleteById(orderId);
     }
 
     @Override
@@ -47,22 +45,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order completeOrder(List<Item> items, User user) {
-        BigDecimal amount = BigDecimal.valueOf(items.stream()
-                .map(i -> i.getPrice())
-                .count());
-        Order order = new Order(amount, user.getUserId());
-        create(order);
-        return order;
+        Order order = new Order(items, user.getUserId());
+        return create(order);
     }
 
     @Override
-    public Optional<List<Order>> getUserOrders(User user) {
+    public List<Order> getUserOrders(User user) {
         List<Order> orderList = new ArrayList<>();
         for (Order order : orderDao.getAll()) {
             if (order.getUserId().equals(user.getUserId())) {
                 orderList.add(order);
             }
         }
-        return Optional.ofNullable(orderList);
+        return orderList;
     }
 }

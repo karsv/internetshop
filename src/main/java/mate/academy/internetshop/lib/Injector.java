@@ -10,9 +10,6 @@ import java.util.List;
 
 import mate.academy.internetshop.dao.UserDao;
 
-/**
- * Students will implement this on Lesson 16 (Servlet)
- */
 public class Injector {
     private static final String PROJECT_MAIN_PACKAGE = "mate.academy.internetshop";
     private static List<Class> classes = new ArrayList<>();

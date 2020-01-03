@@ -1,7 +1,5 @@
 package mate.academy.internetshop.model;
 
-import mate.academy.internetshop.lib.GeneratorId;
-
 public class User {
     private String name;
     private Long userId;

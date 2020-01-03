@@ -30,11 +30,18 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Order update(Order order) {
-        Optional oldOrder = Optional.ofNullable(Storage.orders.stream()
-                .filter(i -> i.getOrderId().equals(order.getOrderId()))
-                .findFirst());
-        Storage.orders.remove(oldOrder.get());
-        Storage.orders.add(order);
+        int orderPos = 0;
+        for (Order o : Storage.orders) {
+            if (o.getOrderId().equals(order.getOrderId())) {
+                break;
+            }
+            orderPos++;
+        }
+        if (orderPos >= Storage.orders.size()) {
+            Storage.orders.add(order);
+        } else {
+            Storage.orders.set(orderPos, order);
+        }
         return order;
     }
 
@@ -44,23 +51,20 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public boolean delete(Long orderId) {
+    public boolean deleteById(Long orderId) {
         Optional optionalOrder = Optional.ofNullable(Storage.orders
                 .stream()
                 .filter(i -> i.getOrderId().equals(orderId))
-                .findFirst())
-                .orElseThrow(() -> new NoSuchElementException("Can't find order with id: "
-                        + orderId));
+                .findFirst());
+        if (optionalOrder.isEmpty()) {
+            return false;
+        }
         Storage.orders.remove(optionalOrder.get());
         return true;
     }
 
     @Override
     public boolean delete(Order order) {
-        if (!Storage.orders.remove(order)) {
-            throw new NoSuchElementException("Can't find order with id: "
-                    + order.getOrderId());
-        }
-        return true;
+        return Storage.orders.remove(order);
     }
 }

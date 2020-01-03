@@ -1,4 +1,4 @@
-package mate.academy.internetshop.lib;
+package mate.academy.internetshop.model;
 
 public class GeneratorId {
     private static Long userId = Long.valueOf(0);

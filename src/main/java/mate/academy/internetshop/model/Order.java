@@ -1,18 +1,25 @@
 package mate.academy.internetshop.model;
 
 import java.math.BigDecimal;
-
-import mate.academy.internetshop.lib.GeneratorId;
+import java.util.List;
 
 public class Order {
     private Long orderId;
     private BigDecimal amount;
     private Long userId;
+    private List<Item> items;
 
-    public Order(BigDecimal amount, Long userId) {
+    public Order(List<Item> items, Long userId) {
         orderId = GeneratorId.getNewOrderId();
-        this.amount = amount;
+        this.items = items;
+        this.amount = countAmoutn(items);
         this.userId = userId;
+    }
+
+    private BigDecimal countAmoutn(List<Item> items) {
+        return BigDecimal.valueOf(items.stream()
+                .map(i -> i.getPrice())
+                .count());
     }
 
     public BigDecimal getAmount() {

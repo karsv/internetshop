@@ -35,35 +35,36 @@ public class BucketDaoImpl implements BucketDao {
 
     @Override
     public Bucket update(Bucket bucket) {
-        if (Storage.buckets.contains(bucket)) {
-            Optional oldBucket = Optional.ofNullable(Storage.buckets
-                    .stream()
-                    .filter(i -> i.getBucketId().equals(bucket.getBucketId()))
-                    .findFirst());
-            Storage.buckets.remove(oldBucket.get());
+        int bucketPos = 0;
+        for (Bucket b : Storage.buckets) {
+            if (b.getBucketId().equals(bucket.getBucketId())) {
+                break;
+            }
+            bucketPos++;
         }
-        Storage.buckets.add(bucket);
+        if (bucketPos >= Storage.buckets.size()) {
+            Storage.buckets.add(bucket);
+        } else {
+            Storage.buckets.set(bucketPos, bucket);
+        }
         return bucket;
     }
 
     @Override
-    public boolean delete(Long bucketId) {
+    public boolean deleteById(Long bucketId) {
         Optional optionalBucket = Optional.ofNullable(Storage.buckets
                 .stream()
                 .filter(i -> i.getBucketId().equals(bucketId))
-                .findFirst())
-                .orElseThrow(() -> new NoSuchElementException("Can't find bucket with id: "
-                        + bucketId));
+                .findFirst());
+        if (optionalBucket.isEmpty()) {
+            return false;
+        }
         Storage.buckets.remove(optionalBucket.get());
         return true;
     }
 
     @Override
     public boolean delete(Bucket bucket) {
-        if (!Storage.buckets.remove(bucket)) {
-            throw new NoSuchElementException("Can't find bucket with id: "
-                    + bucket.getBucketId());
-        }
-        return true;
+        return Storage.buckets.remove(bucket);
     }
 }

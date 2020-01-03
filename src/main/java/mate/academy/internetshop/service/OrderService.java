@@ -20,5 +20,5 @@ public interface OrderService {
 
     Order completeOrder(List<Item> items, User user);
 
-    Optional<List<Order>> getUserOrders(User user);
+    List<Order> getUserOrders(User user);
 }

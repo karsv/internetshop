@@ -22,8 +22,7 @@ public class BucketServiceImpl implements BucketService {
 
     @Override
     public Bucket create(Bucket bucket) {
-        bucketDao.create(bucket);
-        return bucket;
+        return bucketDao.create(bucket);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class BucketServiceImpl implements BucketService {
 
     @Override
     public boolean delete(Long bucketId) {
-        return bucketDao.delete(bucketId);
+        return bucketDao.deleteById(bucketId);
     }
 
     @Override
@@ -50,18 +49,16 @@ public class BucketServiceImpl implements BucketService {
     @Override
     public void addItem(Bucket bucket, Item item) {
         Bucket newBucket = bucketDao.get(bucket.getBucketId()).get();
-        Item item1 = itemDao.get(item.getItemId()).get();
         newBucket.getItems().add(item);
         bucketDao.update(newBucket);
     }
 
     @Override
-    public boolean deleteItem(Bucket bucket, Item item) {
+    public void deleteItem(Bucket bucket, Item item) {
         Bucket newBucket = bucketDao.get(bucket.getBucketId()).get();
         List<Item> itemOfBucket = newBucket.getItems();
         itemOfBucket.remove(item);
         bucketDao.update(newBucket);
-        return true;
     }
 
     @Override
@@ -72,7 +69,7 @@ public class BucketServiceImpl implements BucketService {
     }
 
     @Override
-    public Optional<List<Item>> getAllItems(Bucket bucket) {
-        return Optional.ofNullable(bucketDao.get(bucket.getBucketId()).get().getItems());
+    public List<Item> getAllItems(Bucket bucket) {
+        return bucketDao.get(bucket.getBucketId()).get().getItems();
     }
 }
