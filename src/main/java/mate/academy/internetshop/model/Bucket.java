@@ -1,9 +1,9 @@
 package mate.academy.internetshop.model;
 
-import mate.academy.internetshop.lib.GeneratorId;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import mate.academy.internetshop.lib.GeneratorId;
 
 public class Bucket {
     private Long bucketId;

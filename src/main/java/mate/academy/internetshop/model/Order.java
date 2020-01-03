@@ -1,8 +1,8 @@
 package mate.academy.internetshop.model;
 
-import mate.academy.internetshop.lib.GeneratorId;
-
 import java.math.BigDecimal;
+
+import mate.academy.internetshop.lib.GeneratorId;
 
 public class Order {
     private Long orderId;

@@ -1,104 +1,105 @@
 package mate.academy.internetshop.lib;
 
-import mate.academy.internetshop.dao.BucketDao;
-import mate.academy.internetshop.dao.ItemDao;
-import mate.academy.internetshop.dao.OrderDao;
-import mate.academy.internetshop.dao.UserDao;
-import mate.academy.internetshop.factory.Factory;
-import mate.academy.internetshop.service.impl.BucketServiceImpl;
-import mate.academy.internetshop.service.impl.ItemServiceImpl;
-import mate.academy.internetshop.service.impl.OrderServiceImpl;
-import mate.academy.internetshop.service.impl.UserServiceImpl;
-
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
+import mate.academy.internetshop.dao.UserDao;
+
+/**
+ * Students will implement this on Lesson 16 (Servlet)
+ */
 public class Injector {
+    private static final String PROJECT_MAIN_PACKAGE = "mate.academy.internetshop";
+    private static List<Class> classes = new ArrayList<>();
+
+    static {
+        try {
+            classes.addAll(getClasses(PROJECT_MAIN_PACKAGE));
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static {
+        classes.add(UserDao.class);
+    }
+
     public static void injectDependency() throws IllegalAccessException {
-
-        Class<ItemDao> itemDaoClass = ItemDao.class;
-        Class<UserDao> userDaoClass = UserDao.class;
-        Class<BucketDao> bucketDaoClass = BucketDao.class;
-        Class<OrderDao> orderDaoClass = OrderDao.class;
-
-        Class<BucketServiceImpl> bucketServiceClass = BucketServiceImpl.class;
-        Field[] bucketServiceFields = bucketServiceClass.getDeclaredFields();
-
-        for (Field field : bucketServiceFields) {
-            injectBucketDao(field, bucketDaoClass);
-            injectItemDao(field, itemDaoClass);
-        }
-
-        Class<ItemServiceImpl> itemServiceClass = ItemServiceImpl.class;
-        Field[] itemServiceFields = itemServiceClass.getDeclaredFields();
-
-        for (Field field : itemServiceFields) {
-            injectItemDao(field, itemDaoClass);
-        }
-
-        Class<OrderServiceImpl> orderServiceClass = OrderServiceImpl.class;
-        Field[] orderServiceFields = orderServiceClass.getDeclaredFields();
-
-        for (Field field : orderServiceFields) {
-            injectOrderDao(field, orderDaoClass);
-        }
-
-        Class<UserServiceImpl> userServiceClass = UserServiceImpl.class;
-        Field[] userServiceFields = userServiceClass.getDeclaredFields();
-
-        for (Field field : userServiceFields) {
-            injectUserDao(field, userDaoClass);
-        }
-    }
-
-    private static void injectBucketDao(Field field, Class<BucketDao> bucketDao)
-            throws IllegalAccessException {
-        if (field.getDeclaredAnnotation(Inject.class) != null
-                && field.getType().equals(BucketDao.class)) {
-            if (bucketDao.getDeclaredAnnotation(Dao.class) != null) {
-                field.setAccessible(true);
-                field.set(null, Factory.getBucketDao());
-            } else {
-                System.err.println("Wrong DAO format");
+        for (Class certainClass : classes) {
+            for (Field field : certainClass.getDeclaredFields()) {
+                if (field.getDeclaredAnnotation(Inject.class) != null) {
+                    Object implementation = AnnotatedClassMap.getImplementation(field.getType());
+                    if (implementation.getClass().getDeclaredAnnotation(Service.class) != null
+                            || implementation.getClass()
+                            .getDeclaredAnnotation(Dao.class) != null) {
+                        field.setAccessible(true);
+                        field.set(null, implementation);
+                    }
+                }
             }
         }
     }
 
-    private static void injectUserDao(Field field, Class<UserDao> userDao)
-            throws IllegalAccessException {
-        if (field.getDeclaredAnnotation(Inject.class) != null
-                && field.getType().equals(UserDao.class)) {
-            if (userDao.getDeclaredAnnotation(Dao.class) != null) {
-                field.setAccessible(true);
-                field.set(null, Factory.getUserDao());
-            } else {
-                System.err.println("Wrong DAO format");
-            }
+    /**
+     * Scans all classes accessible from the context class loader which
+     * belong to the given package and subpackages.
+     *
+     * @param packageName The base package
+     * @return The classes
+     * @throws ClassNotFoundException if the class cannot be located
+     * @throws IOException if I/O errors occur
+     */
+    private static List<Class> getClasses(String packageName)
+            throws IOException, ClassNotFoundException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<File>();
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
         }
+        ArrayList<Class> classes = new ArrayList<Class>();
+        for (File directory : dirs) {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return classes;
     }
 
-    private static void injectOrderDao(Field field, Class<OrderDao> orderDao)
-            throws IllegalAccessException {
-        if (field.getDeclaredAnnotation(Inject.class) != null
-                && field.getType().equals(OrderDao.class)) {
-            if (orderDao.getDeclaredAnnotation(Dao.class) != null) {
-                field.setAccessible(true);
-                field.set(null, Factory.getOrderDao());
-            } else {
-                System.err.println("Wrong DAO format");
+    /**
+     * Recursive method used to find all classes in a given directory and subdirs.
+     *
+     * @param directory   The base directory
+     * @param packageName The package name for classes found inside the base directory
+     * @return The classes
+     * @throws ClassNotFoundException if the class cannot be located
+     */
+    private static List<Class> findClasses(File directory, String packageName)
+            throws ClassNotFoundException {
+        List<Class> classes = new ArrayList<Class>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    assert !file.getName().contains(".");
+                    classes.addAll(findClasses(file, packageName + "."
+                            + file.getName()));
+                } else if (file.getName().endsWith(".class")) {
+                    classes.add(Class.forName(packageName + '.'
+                            + file.getName().substring(0,
+                            file.getName().length() - 6)));
+                }
             }
         }
-    }
-
-    private static void injectItemDao(Field field, Class<ItemDao> itemDao)
-            throws IllegalAccessException {
-        if (field.getDeclaredAnnotation(Inject.class) != null
-                && field.getType().equals(ItemDao.class)) {
-            if (itemDao.getDeclaredAnnotation(Dao.class) != null) {
-                field.setAccessible(true);
-                field.set(null, Factory.getItemDao());
-            } else {
-                System.err.println("Wrong DAO format");
-            }
-        }
+        return classes;
     }
 }

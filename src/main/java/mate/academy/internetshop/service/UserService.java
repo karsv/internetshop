@@ -1,8 +1,8 @@
 package mate.academy.internetshop.service;
 
-import mate.academy.internetshop.model.User;
-
 import java.util.Optional;
+
+import mate.academy.internetshop.model.User;
 
 public interface UserService {
     User create(User user);

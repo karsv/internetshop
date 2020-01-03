@@ -1,9 +1,9 @@
 package mate.academy.internetshop.model;
 
-import mate.academy.internetshop.lib.GeneratorId;
-
 import java.math.BigDecimal;
 import java.util.Objects;
+
+import mate.academy.internetshop.lib.GeneratorId;
 
 public class Item {
     private Long itemId;
