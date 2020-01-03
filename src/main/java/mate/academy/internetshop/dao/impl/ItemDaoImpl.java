@@ -49,11 +49,10 @@ public class ItemDaoImpl implements ItemDao {
                 .stream()
                 .filter(i -> i.getItemId().equals(itemId))
                 .findFirst());
-        if (optionalItem.isEmpty()) {
-            return false;
+        if (optionalItem.isPresent()) {
+            return Storage.items.remove(optionalItem.get());
         }
-        Storage.items.remove(optionalItem.get());
-        return true;
+        return false;
     }
 
     @Override

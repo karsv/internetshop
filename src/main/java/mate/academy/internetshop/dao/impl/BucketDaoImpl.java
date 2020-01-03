@@ -57,7 +57,7 @@ public class BucketDaoImpl implements BucketDao {
                 .findFirst().get());
         if (optionalBucket.isPresent()) {
             Storage.buckets.remove(optionalBucket.get());
-            return true;
+            return Storage.buckets.remove(optionalBucket.get());
         }
         return false;
     }

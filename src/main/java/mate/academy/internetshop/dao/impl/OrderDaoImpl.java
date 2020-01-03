@@ -55,11 +55,10 @@ public class OrderDaoImpl implements OrderDao {
                 .stream()
                 .filter(i -> i.getOrderId().equals(orderId))
                 .findFirst());
-        if (optionalOrder.isEmpty()) {
-            return false;
+        if (optionalOrder.isPresent()) {
+            return Storage.orders.remove(optionalOrder.get());
         }
-        Storage.orders.remove(optionalOrder.get());
-        return true;
+        return false;
     }
 
     @Override

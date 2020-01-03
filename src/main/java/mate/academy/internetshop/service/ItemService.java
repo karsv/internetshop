@@ -12,7 +12,7 @@ public interface ItemService {
 
     Item update(Item item);
 
-    List getAllItems();
+    List<Item> getAllItems();
 
     boolean deleteById(Long itemId);
 

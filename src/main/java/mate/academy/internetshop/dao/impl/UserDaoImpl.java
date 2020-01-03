@@ -50,10 +50,9 @@ public class UserDaoImpl implements UserDao {
                 .filter(i -> i.getUserId().equals(userId))
                 .findFirst());
         if (optionalUser.isEmpty()) {
-            return false;
+            return Storage.users.remove(optionalUser.get());
         }
-        Storage.users.remove(optionalUser.get());
-        return true;
+        return false;
     }
 
     @Override
