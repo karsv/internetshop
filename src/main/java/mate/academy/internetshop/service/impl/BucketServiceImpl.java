@@ -15,10 +15,10 @@ import mate.academy.internetshop.service.BucketService;
 public class BucketServiceImpl implements BucketService {
 
     @Inject
-    private BucketDao bucketDao;
+    private static BucketDao bucketDao;
 
     @Inject
-    private ItemDao itemDao;
+    private static ItemDao itemDao;
 
     @Override
     public Bucket create(Bucket bucket) {

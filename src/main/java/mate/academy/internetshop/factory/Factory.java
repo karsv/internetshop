@@ -22,6 +22,7 @@ public class Factory {
     private static BucketDao bucketDaoInstance;
     private static ItemDao itemDaoInstance;
     private static OrderDao orderDaoInstance;
+
     private static OrderService orderServiceInstance;
     private static UserService userServiceInstance;
     private static ItemService itemServiceInstance;
