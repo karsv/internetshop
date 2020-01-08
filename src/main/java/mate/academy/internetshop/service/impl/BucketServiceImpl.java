@@ -37,7 +37,12 @@ public class BucketServiceImpl implements BucketService {
     }
 
     @Override
-    public boolean delete(Long bucketId) {
+    public List<Bucket> getAll() {
+        return bucketDao.getAll();
+    }
+
+    @Override
+    public boolean deleteById(Long bucketId) {
         return bucketDao.deleteById(bucketId);
     }
 

@@ -1,5 +1,6 @@
 package mate.academy.internetshop.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.UserDao;
@@ -31,7 +32,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean delete(Long userId) {
+    public List<User> getAll() {
+        return userDao.getAll();
+    }
+
+    @Override
+    public boolean deleteById(Long userId) {
         return userDao.deleteById(userId);
     }
 
