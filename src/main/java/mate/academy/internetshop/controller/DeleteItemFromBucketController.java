@@ -12,7 +12,7 @@ import mate.academy.internetshop.model.Item;
 import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.ItemService;
 
-public class AddItemToBucketController extends HttpServlet {
+public class DeleteItemFromBucketController extends HttpServlet {
     private static final Long USER_ID = Long.valueOf(1);
 
     @Inject
@@ -25,10 +25,10 @@ public class AddItemToBucketController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Bucket bucket = bucketService.getAll().stream().filter(x -> x.getUserId().equals(USER_ID)).findFirst().get();
 
-        String itemId = req.getParameter("item_id");
-        Item item = itemService.get(Long.valueOf(itemId)).get();
+        Long itemId = Long.valueOf(req.getParameter("item_id"));
+        Item item = itemService.get(itemId).get();
 
-        bucketService.addItem(bucket, item);
+        bucketService.deleteItem(bucket, item);
         resp.sendRedirect(req.getContextPath() + "/bucket");
     }
 }

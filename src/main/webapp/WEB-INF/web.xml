@@ -50,6 +50,24 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>addItemToBucket</servlet-name>
+        <url-pattern>/addItemToBucket</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>deleteItemFromBucket</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.DeleteItemFromBucketController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>deleteItemFromBucket</servlet-name>
+        <url-pattern>/deleteItemFromBucket</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>getItemsFromBucket</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.GetAllItemsFromBucketController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getItemsFromBucket</servlet-name>
         <url-pattern>/bucket</url-pattern>
     </servlet-mapping>
 </web-app>

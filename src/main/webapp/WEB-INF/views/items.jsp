@@ -26,7 +26,7 @@ Items:
                 <c:out value="${item.price}"/>
             </td>
             <td>
-                <a href="bucket?item_id=${item.itemId}">Add</a>
+                <a href="addItemToBucket?item_id=${item.itemId}">Add</a>
             </td>
         </tr>
     </c:forEach>

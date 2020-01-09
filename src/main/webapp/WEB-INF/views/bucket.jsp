@@ -23,6 +23,9 @@
             <td>
                 <c:out value="${item.price}"/>
             </td>
+            <td>
+                <a href="deleteItemFromBucket?item_id=${item.itemId}">Delete</a>
+            </td>
         </tr>
     </c:forEach>
 </table>
