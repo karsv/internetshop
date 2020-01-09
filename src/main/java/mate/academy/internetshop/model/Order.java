@@ -21,6 +21,14 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
     public BigDecimal getAmount() {
         return amount;
     }

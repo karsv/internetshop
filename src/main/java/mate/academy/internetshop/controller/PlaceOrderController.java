@@ -33,15 +33,14 @@ public class PlaceOrderController extends HttpServlet {
         Bucket bucket = bucketService.getAll().stream().filter(x -> x.getUserId().equals(USER_ID)).findFirst().get();
         User user = userService.get(USER_ID).get();
 
-        orderService.completeOrder(bucket.getItems(), user);
+        Order order = orderService.completeOrder(bucket.getItems(), user);
+        bucketService.delete(bucket);
 
-        List<Item> itemList = bucketService.getAllItems(bucket);
+        List<Item> itemList = orderService.get(order.getOrderId()).get().getItems();
         req.setAttribute("items", itemList);
-        Order order = orderService.getAll().stream().filter(u -> u.getUserId().equals(USER_ID)).findFirst().get();
         req.setAttribute("amount", order.getAmount());
         req.setAttribute("order_id", order.getOrderId());
 
-        bucketService.delete(bucket);
         req.getRequestDispatcher("WEB-INF/views/order.jsp").forward(req, resp);
     }
 }
