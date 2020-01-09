@@ -2,19 +2,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>Items</title>
+    <title>Order</title>
 </head>
 <body>
-<table border="3">
+<table border="1">
+    <jsp:useBean id="order_id" scope="request" type="java.lang.Long"/>
     <tr>
-        Items:
+        <td>Order ID: ${order_id}</td>
     </tr>
-    <tr>
-        <td>ID</td>
-        <td>Name</td>
-        <td>Price</td>
-    </tr>
-
     <jsp:useBean id="items" scope="request" type="java.util.List<mate.academy.internetshop.model.Item>"/>
     <c:forEach var="item" items="${items}">
         <tr>
@@ -27,13 +22,11 @@
             <td>
                 <c:out value="${item.price}"/>
             </td>
-            <td>
-                <a href="addItemToBucket?item_id=${item.itemId}">Add</a>
-            </td>
         </tr>
     </c:forEach>
+    <jsp:useBean id="amount" scope="request" type="java.math.BigDecimal"/>
     <tr>
-        <a href="bucket">Show bucket</a>
+        <td>Amount: ${amount}</td>
     </tr>
 </table>
 </body>

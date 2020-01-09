@@ -7,6 +7,9 @@
 <body>
 <table border="5">
     <tr>
+        <a href="items">Go back to items</a>
+    </tr>
+    <tr>
         <td>Id</td>
         <td>Name</td>
         <td>Price</td>
@@ -29,5 +32,8 @@
         </tr>
     </c:forEach>
 </table>
+<tr>
+    <a href="order">Place Order</a>
+</tr>
 </body>
 </html>

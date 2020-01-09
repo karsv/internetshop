@@ -70,4 +70,13 @@
         <servlet-name>getItemsFromBucket</servlet-name>
         <url-pattern>/bucket</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>placeOrder</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.PlaceOrderController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>placeOrder</servlet-name>
+        <url-pattern>/order</url-pattern>
+    </servlet-mapping>
 </web-app>
