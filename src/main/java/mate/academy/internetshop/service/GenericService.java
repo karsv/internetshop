@@ -14,5 +14,5 @@ public interface GenericService<T, N> {
 
     boolean deleteById(N entityId);
 
-    boolean delete(T item);
+    boolean delete(T entity);
 }

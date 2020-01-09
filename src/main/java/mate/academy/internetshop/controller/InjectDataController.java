@@ -7,12 +7,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import mate.academy.internetshop.lib.Inject;
+import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Item;
+import mate.academy.internetshop.model.User;
+import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.ItemService;
+import mate.academy.internetshop.service.UserService;
 
 public class InjectDataController extends HttpServlet {
     @Inject
     private static ItemService itemService;
+
+    @Inject
+    private static UserService userService;
+
+    @Inject
+    private static BucketService bucketService;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,6 +37,16 @@ public class InjectDataController extends HttpServlet {
         itemService.create(item4);
         itemService.create(item5);
 
-        resp.sendRedirect(req.getContextPath() + "/index");
+        User user = new User("User");
+        userService.create(user);
+
+        Bucket bucket = new Bucket();
+        bucket.setUserId(user.getUserId());
+        bucketService.create(bucket);
+        bucketService.addItem(bucket, item1);
+        bucketService.addItem(bucket, item3);
+        bucketService.addItem(bucket, item5);
+
+        resp.sendRedirect(req.getContextPath() + "/items");
     }
 }
