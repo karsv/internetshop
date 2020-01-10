@@ -27,16 +27,16 @@
                 <c:out value="${item.price}"/>
             </td>
             <td>
-                <a href="addItemToBucket?item_id=${item.itemId}">Add</a>
+                <a href="${pageContext.request.contextPath}/addItemToBucket?item_id=${item.itemId}">Add</a>
             </td>
         </tr>
     </c:forEach>
 </table>
 <br>
-<a href="bucket">Show bucket</a>
+<a href="${pageContext.request.contextPath}/bucket">Show bucket</a>
 </br>
 <br>
-<a href="index">Back to main</a>
+<a href="${pageContext.request.contextPath}/index">Back to main</a>
 </br>
 </body>
 </html>

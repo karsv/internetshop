@@ -6,7 +6,7 @@
 </head>
 <body>
 <br>
-    <a href="items">Go back to items</a>
+    <a href="${pageContext.request.contextPath}/items">Go back to items</a>
 </br>
 <table border="5">
     <tr>
@@ -27,16 +27,16 @@
                 <c:out value="${item.price}"/>
             </td>
             <td>
-                <a href="deleteItemFromBucket?item_id=${item.itemId}">Delete</a>
+                <a href="${pageContext.request.contextPath}/deleteItemFromBucket?item_id=${item.itemId}">Delete</a>
             </td>
         </tr>
     </c:forEach>
 </table>
 <br>
-<a href="order">Place Order</a>
+<a href="${pageContext.request.contextPath}/order">Place Order</a>
 </br>
 <br>
-<a href="index">Back to main</a>
+<a href="${pageContext.request.contextPath}/index">Back to main</a>
 </br>
 </body>
 </html>

@@ -7,13 +7,13 @@
 </head>
 <body>
 <br>
-<a href="add">Initial Add</a>
+<a href="${pageContext.request.contextPath}/add">Initial Add</a>
 </br>
 <br>
-<a href="items">Show items</a>
+<a href="${pageContext.request.contextPath}/items">Show items</a>
 </br>
 <br>
-<a href="userOrders">Show Orders</a>
+<a href="${pageContext.request.contextPath}/userOrders">Show Orders</a>
 </br>
 </body>
 </html>

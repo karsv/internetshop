@@ -29,7 +29,7 @@
     </c:forEach>
 </table>
 <br>
-<a href="index">Back to main</a>
+<a href="${pageContext.request.contextPath}/index">Back to main</a>
 </br>
 </body>
 </html>
