@@ -17,7 +17,7 @@ import mate.academy.internetshop.service.OrderService;
 import mate.academy.internetshop.service.UserService;
 
 public class PlaceOrderController extends HttpServlet {
-    private static final Long USER_ID = Long.valueOf(1);
+    private static final Long USER_ID = 1L;
 
     @Inject
     private static BucketService bucketService;
@@ -31,11 +31,9 @@ public class PlaceOrderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Bucket bucket = bucketService.getAll().stream()
-                .filter(x -> x.getUserId()
-                        .equals(USER_ID))
-                .findFirst()
-                .get();
+
+        String bucketId = req.getParameter("bucket_id");
+        Bucket bucket = bucketService.get(Long.valueOf(bucketId)).get();
         User user = userService.get(USER_ID).get();
 
         Order order = orderService.completeOrder(bucket.getItems(), user);

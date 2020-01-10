@@ -14,7 +14,7 @@ import mate.academy.internetshop.service.OrderService;
 import mate.academy.internetshop.service.UserService;
 
 public class GetAllUserOrdersController extends HttpServlet {
-    private static final Long USER_ID = Long.valueOf(1);
+    private static final Long USER_ID = 1L;
 
     @Inject
     private static OrderService orderService;

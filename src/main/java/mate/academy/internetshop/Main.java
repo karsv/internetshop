@@ -33,8 +33,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        User user = new User("Name");
-        User user2 = new User("Name2");
+        User user = new User("Name", "123");
+        User user2 = new User("Name2", "123");
         userService.create(user);
         userService.create(user2);
         System.out.println(Storage.users);

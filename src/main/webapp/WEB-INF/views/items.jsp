@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<jsp:useBean id="items" scope="request" type="java.util.List<mate.academy.internetshop.model.Item>"/>
 <html>
 <head>
     <title>Items</title>
@@ -14,7 +15,6 @@
         <td>Name</td>
         <td>Price</td>
     </tr>
-    <jsp:useBean id="items" scope="request" type="java.util.List<mate.academy.internetshop.model.Item>"/>
     <c:forEach var="item" items="${items}">
         <tr>
             <td>

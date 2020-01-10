@@ -13,7 +13,7 @@ import mate.academy.internetshop.service.ItemService;
 import mate.academy.internetshop.service.UserService;
 
 public class InjectDataController extends HttpServlet {
-    private static final Long USER_ID = Long.valueOf(1);
+    private static final Long USER_ID = 1L;
 
     @Inject
     private static ItemService itemService;

@@ -13,7 +13,7 @@ import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.ItemService;
 
 public class AddItemToBucketController extends HttpServlet {
-    private static final Long USER_ID = Long.valueOf(1);
+    private static final Long USER_ID = 1L;
 
     @Inject
     private static BucketService bucketService;
@@ -24,21 +24,11 @@ public class AddItemToBucketController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Bucket bucket;
-        if (bucketService.getAll().stream()
+        Bucket bucket = bucketService.getAll().stream()
                 .filter(x -> x.getUserId().equals(USER_ID))
                 .findFirst()
-                .isPresent()) {
-            bucket = bucketService.getAll().stream()
-                    .filter(x -> x.getUserId()
-                            .equals(USER_ID))
-                    .findFirst()
-                    .get();
-        } else {
-            bucket = new Bucket();
-            bucket.setUserId(USER_ID);
-            bucketService.create(bucket);
-        }
+                .orElse(bucketService.create(new Bucket()));
+        bucket.setUserId(USER_ID);
 
         String itemId = req.getParameter("item_id");
         Item item = itemService.get(Long.valueOf(itemId)).get();
