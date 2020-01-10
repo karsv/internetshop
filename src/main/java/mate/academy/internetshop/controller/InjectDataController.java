@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Item;
-import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.ItemService;
 import mate.academy.internetshop.service.UserService;
@@ -38,9 +37,6 @@ public class InjectDataController extends HttpServlet {
         itemService.create(item3);
         itemService.create(item4);
         itemService.create(item5);
-
-        User user = new User("User");
-        userService.create(user);
 
         resp.sendRedirect(req.getContextPath() + "/items");
     }
