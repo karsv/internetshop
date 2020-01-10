@@ -19,8 +19,24 @@ public class GetAllItemsFromBucketController extends HttpServlet {
     private static BucketService bucketService;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Bucket bucket = bucketService.getAll().stream().filter(x -> x.getUserId().equals(USER_ID)).findFirst().get();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Bucket bucket;
+        if (bucketService.getAll().stream()
+                .filter(x -> x.getUserId()
+                        .equals(USER_ID))
+                .findFirst()
+                .isPresent()) {
+            bucket = bucketService.getAll().stream()
+                    .filter(x -> x.getUserId()
+                            .equals(USER_ID))
+                    .findFirst()
+                    .get();
+        } else {
+            bucket = new Bucket();
+            bucket.setUserId(USER_ID);
+            bucketService.create(bucket);
+        }
 
         List<Item> itemList = bucketService.getAllItems(bucket);
         req.setAttribute("bucketItems", itemList);

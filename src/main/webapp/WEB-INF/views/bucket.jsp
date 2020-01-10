@@ -5,10 +5,10 @@
     <title>Bucket</title>
 </head>
 <body>
+<br>
+    <a href="items">Go back to items</a>
+</br>
 <table border="5">
-    <tr>
-        <a href="items">Go back to items</a>
-    </tr>
     <tr>
         <td>Id</td>
         <td>Name</td>
@@ -32,8 +32,11 @@
         </tr>
     </c:forEach>
 </table>
-<tr>
-    <a href="order">Place Order</a>
-</tr>
+<br>
+<a href="order">Place Order</a>
+</br>
+<br>
+<a href="index">Back to main</a>
+</br>
 </body>
 </html>

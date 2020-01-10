@@ -4,7 +4,7 @@
 <head>
     <title>Order</title>
 </head>
-<body>
+<br>
 <table border="1">
     <jsp:useBean id="order_id" scope="request" type="java.lang.Long"/>
     <tr>
@@ -29,5 +29,8 @@
         <td>Amount: ${amount}</td>
     </tr>
 </table>
+<br>
+<a href="index">Back to main</a>
+</br>
 </body>
 </html>

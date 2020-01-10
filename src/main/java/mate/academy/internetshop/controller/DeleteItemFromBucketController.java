@@ -22,8 +22,13 @@ public class DeleteItemFromBucketController extends HttpServlet {
     private static ItemService itemService;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Bucket bucket = bucketService.getAll().stream().filter(x -> x.getUserId().equals(USER_ID)).findFirst().get();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Bucket bucket = bucketService.getAll().stream()
+                .filter(x -> x.getUserId()
+                        .equals(USER_ID))
+                .findFirst()
+                .get();
 
         Long itemId = Long.valueOf(req.getParameter("item_id"));
         Item item = itemService.get(itemId).get();

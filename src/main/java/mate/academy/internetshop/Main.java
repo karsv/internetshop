@@ -55,6 +55,7 @@ public class Main {
         bucketService.addItem(bucket, item3);
         System.out.println(Storage.buckets);
         orderService.completeOrder(bucketService.getAllItems(bucket), user);
+
         System.out.println(Storage.orders);
     }
 }

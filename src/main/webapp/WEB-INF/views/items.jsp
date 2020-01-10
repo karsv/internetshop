@@ -14,7 +14,6 @@
         <td>Name</td>
         <td>Price</td>
     </tr>
-
     <jsp:useBean id="items" scope="request" type="java.util.List<mate.academy.internetshop.model.Item>"/>
     <c:forEach var="item" items="${items}">
         <tr>
@@ -32,9 +31,12 @@
             </td>
         </tr>
     </c:forEach>
-    <tr>
-        <a href="bucket">Show bucket</a>
-    </tr>
 </table>
+<br>
+<a href="bucket">Show bucket</a>
+</br>
+<br>
+<a href="index">Back to main</a>
+</br>
 </body>
 </html>

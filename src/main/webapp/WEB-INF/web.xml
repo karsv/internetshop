@@ -37,7 +37,7 @@
 
     <servlet>
         <servlet-name>orders</servlet-name>
-        <servlet-class>mate.academy.internetshop.controller.GetAllUserOrders</servlet-class>
+        <servlet-class>mate.academy.internetshop.controller.GetAllUserOrdersController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>orders</servlet-name>
@@ -78,5 +78,23 @@
     <servlet-mapping>
         <servlet-name>placeOrder</servlet-name>
         <url-pattern>/order</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>getAllUserOrders</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.GetAllUserOrdersController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getAllUserOrders</servlet-name>
+        <url-pattern>/userOrders</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>deleteOrder</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.DeleteOrderController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>deleteOrder</servlet-name>
+        <url-pattern>/deleteOrder</url-pattern>
     </servlet-mapping>
 </web-app>

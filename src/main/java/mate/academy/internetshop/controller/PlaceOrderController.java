@@ -29,8 +29,13 @@ public class PlaceOrderController extends HttpServlet {
     private static OrderService orderService;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Bucket bucket = bucketService.getAll().stream().filter(x -> x.getUserId().equals(USER_ID)).findFirst().get();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Bucket bucket = bucketService.getAll().stream()
+                .filter(x -> x.getUserId()
+                        .equals(USER_ID))
+                .findFirst()
+                .get();
         User user = userService.get(USER_ID).get();
 
         Order order = orderService.completeOrder(bucket.getItems(), user);
