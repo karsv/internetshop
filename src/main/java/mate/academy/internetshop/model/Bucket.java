@@ -12,6 +12,11 @@ public class Bucket {
         items = new ArrayList<>();
     }
 
+    public Bucket(Long userId) {
+        this();
+        this.userId = userId;
+    }
+
     public Long getUserId() {
         return userId;
     }

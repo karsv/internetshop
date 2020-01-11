@@ -78,7 +78,7 @@ public class BucketServiceImpl implements BucketService {
         return bucketDao.getAll().stream()
                 .filter(x -> x.getUserId().equals(userId))
                 .findFirst()
-                .orElse(create(new Bucket()));
+                .orElse(create(new Bucket(userId)));
     }
 
     @Override

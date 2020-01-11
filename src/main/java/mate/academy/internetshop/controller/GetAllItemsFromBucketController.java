@@ -20,7 +20,6 @@ public class GetAllItemsFromBucketController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         Bucket bucket = bucketService.getByUserId(USER_ID);
-        bucket.setUserId(USER_ID);
         bucketService.create(bucket);
 
         req.setAttribute("bucket", bucket);
