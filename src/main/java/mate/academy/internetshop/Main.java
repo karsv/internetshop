@@ -41,7 +41,7 @@ public class Main {
         userService.delete(user);
         System.out.println(Storage.users);
 
-        Bucket bucket = new Bucket();
+        Bucket bucket = new Bucket(user.getUserId());
         bucketService.create(bucket);
         Item item1 = new Item("Item 1", 1.0);
         Item item2 = new Item("Item 2", 2.0);
