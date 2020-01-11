@@ -8,8 +8,9 @@ public class Bucket {
     private Long bucketId;
     private List<Item> items;
 
-    public Bucket() {
+    public Bucket(Long userId) {
         items = new ArrayList<>();
+        this.userId = userId;
     }
 
     public Long getUserId() {

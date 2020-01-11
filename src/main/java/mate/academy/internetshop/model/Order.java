@@ -16,9 +16,17 @@ public class Order {
     }
 
     private BigDecimal countAmoutn(List<Item> items) {
-        return BigDecimal.valueOf(items.stream()
+        return items.stream()
                 .map(i -> i.getPrice())
-                .count());
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
     public BigDecimal getAmount() {

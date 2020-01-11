@@ -33,15 +33,15 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        User user = new User("Name");
-        User user2 = new User("Name2");
+        User user = new User("Name", "123");
+        User user2 = new User("Name2", "123");
         userService.create(user);
         userService.create(user2);
         System.out.println(Storage.users);
         userService.delete(user);
         System.out.println(Storage.users);
 
-        Bucket bucket = new Bucket();
+        Bucket bucket = new Bucket(user.getUserId());
         bucketService.create(bucket);
         Item item1 = new Item("Item 1", 1.0);
         Item item2 = new Item("Item 2", 2.0);
@@ -55,6 +55,7 @@ public class Main {
         bucketService.addItem(bucket, item3);
         System.out.println(Storage.buckets);
         orderService.completeOrder(bucketService.getAllItems(bucket), user);
+
         System.out.println(Storage.orders);
     }
 }
