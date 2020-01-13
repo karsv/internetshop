@@ -91,7 +91,7 @@
 
     <servlet>
         <servlet-name>placeOrder</servlet-name>
-        <servlet-class>mate.academy.internetshop.controller.PlaceOrderController</servlet-class>
+        <servlet-class>mate.academy.internetshop.controller.CompleteOrderController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>placeOrder</servlet-name>

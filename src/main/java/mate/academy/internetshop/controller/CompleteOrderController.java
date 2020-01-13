@@ -16,7 +16,7 @@ import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.OrderService;
 import mate.academy.internetshop.service.UserService;
 
-public class PlaceOrderController extends HttpServlet {
+public class CompleteOrderController extends HttpServlet {
     private static final Long USER_ID = 1L;
 
     @Inject
@@ -32,8 +32,7 @@ public class PlaceOrderController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String bucketId = req.getParameter("bucket_id");
-        Bucket bucket = bucketService.get(Long.valueOf(bucketId)).get();
+        Bucket bucket = bucketService.getByUserId(USER_ID);
         User user = userService.get(USER_ID).get();
 
         Order order = orderService.completeOrder(bucket.getItems(), user);
