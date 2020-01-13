@@ -54,7 +54,10 @@ public class OrderDaoImpl implements OrderDao {
         Optional optionalOrder = Optional.ofNullable(Storage.orders
                 .stream()
                 .filter(i -> i.getOrderId().equals(orderId))
-                .findFirst());
+                .findFirst()
+                .orElseThrow(()
+                        -> new NoSuchElementException("Can't find order with id: "
+                        + orderId)));
         if (optionalOrder.isPresent()) {
             return Storage.orders.remove(optionalOrder.get());
         }

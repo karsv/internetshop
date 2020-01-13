@@ -27,6 +27,24 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>addItem</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.AddItemController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>addItem</servlet-name>
+        <url-pattern>/addItem</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>deleteItem</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.DeleteItemController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>deleteItem</servlet-name>
+        <url-pattern>/deleteItem</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>add</servlet-name>
         <servlet-class>mate.academy.internetshop.controller.InjectDataController</servlet-class>
     </servlet>
@@ -73,7 +91,7 @@
 
     <servlet>
         <servlet-name>placeOrder</servlet-name>
-        <servlet-class>mate.academy.internetshop.controller.PlaceOrderController</servlet-class>
+        <servlet-class>mate.academy.internetshop.controller.CompleteOrderController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>placeOrder</servlet-name>

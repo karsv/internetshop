@@ -1,6 +1,7 @@
 package mate.academy.internetshop.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,11 +28,11 @@ public class InjectDataController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Item item1 = new Item("Item1", 1.0);
-        Item item2 = new Item("Item2", 2.0);
-        Item item3 = new Item("Item3", 3.0);
-        Item item4 = new Item("Item4", 4.0);
-        Item item5 = new Item("Item5", 5.0);
+        Item item1 = new Item("Item1", BigDecimal.valueOf(1.0));
+        Item item2 = new Item("Item2", BigDecimal.valueOf(2.0));
+        Item item3 = new Item("Item3", BigDecimal.valueOf(3.0));
+        Item item4 = new Item("Item4", BigDecimal.valueOf(4.0));
+        Item item5 = new Item("Item5", BigDecimal.valueOf(5.0));
         itemService.create(item1);
         itemService.create(item2);
         itemService.create(item3);

@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import mate.academy.internetshop.lib.Inject;
-import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
 
 public class DeleteUserController extends HttpServlet {
@@ -17,9 +16,7 @@ public class DeleteUserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Long userId = Long.valueOf(req.getParameter("user_id"));
-        User user = userService.get(userId).get();
-        userService.delete(user);
+        userService.deleteById(Long.valueOf(req.getParameter("user_id")));
         resp.sendRedirect(req.getContextPath() + "/allUsers");
 
     }

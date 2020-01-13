@@ -29,6 +29,9 @@
             <td>
                 <a href="${pageContext.request.contextPath}/addItemToBucket?item_id=${item.itemId}">Add</a>
             </td>
+            <td>
+                <a href="${pageContext.request.contextPath}/deleteItem?item_id=${item.itemId}">Delete</a>
+            </td>
         </tr>
     </c:forEach>
 </table>

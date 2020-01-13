@@ -33,7 +33,7 @@
     </c:forEach>
 </table>
 <br>
-<a href="${pageContext.request.contextPath}/order?bucket_id=${bucket.bucketId}">Place Order</a>
+<a href="${pageContext.request.contextPath}/order">Place Order</a>
 </br>
 <br>
 <a href="${pageContext.request.contextPath}/index">Back to main</a>

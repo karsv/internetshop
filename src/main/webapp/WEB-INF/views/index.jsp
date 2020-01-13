@@ -10,6 +10,9 @@
 <a href="${pageContext.request.contextPath}/add">Initial Add</a>
 </br>
 <br>
+<a href="${pageContext.request.contextPath}/addItem">Add Item</a>
+</br>
+<br>
 <a href="${pageContext.request.contextPath}/registration">Register User</a>
 </br>
 <br>

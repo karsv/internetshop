@@ -7,16 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import mate.academy.internetshop.lib.Inject;
-import mate.academy.internetshop.service.OrderService;
+import mate.academy.internetshop.service.ItemService;
 
-public class DeleteOrderController extends HttpServlet {
+public class DeleteItemController extends HttpServlet {
     @Inject
-    private static OrderService orderService;
+    private static ItemService itemService;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        orderService.deleteById(Long.valueOf(req.getParameter("order_id")));
-        resp.sendRedirect(req.getContextPath() + "/userOrders");
+        itemService.deleteById(Long.valueOf(req.getParameter("item_id")));
+        resp.sendRedirect(req.getContextPath() + "/items");
     }
 }
