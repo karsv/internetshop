@@ -1,5 +1,7 @@
 package mate.academy.internetshop;
 
+import java.math.BigDecimal;
+
 import mate.academy.internetshop.db.Storage;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.lib.Injector;
@@ -43,9 +45,9 @@ public class Main {
 
         Bucket bucket = new Bucket(user.getUserId());
         bucketService.create(bucket);
-        Item item1 = new Item("Item 1", 1.0);
-        Item item2 = new Item("Item 2", 2.0);
-        Item item3 = new Item("Item 3", 3.0);
+        Item item1 = new Item("Item 1", BigDecimal.valueOf(1.0));
+        Item item2 = new Item("Item 2", BigDecimal.valueOf(2.0));
+        Item item3 = new Item("Item 3", BigDecimal.valueOf(3.0));
         itemService.create(item1);
         itemService.create(item2);
         itemService.create(item3);
