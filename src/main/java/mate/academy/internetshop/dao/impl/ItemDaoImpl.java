@@ -48,7 +48,8 @@ public class ItemDaoImpl implements ItemDao {
         Optional optionalItem = Optional.ofNullable(Storage.items
                 .stream()
                 .filter(i -> i.getItemId().equals(itemId))
-                .findFirst().orElseThrow(() -> new NoSuchElementException("Can't find item with id: "
+                .findFirst().orElseThrow(()
+                        -> new NoSuchElementException("Can't find item with id: "
                 + itemId)));
         if (optionalItem.isPresent()) {
             return Storage.items.remove(optionalItem.get());

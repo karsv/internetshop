@@ -49,8 +49,11 @@ public class UserDaoImpl implements UserDao {
         Optional optionalUser = Optional.ofNullable(Storage.users
                 .stream()
                 .filter(i -> i.getUserId().equals(userId))
-                .findFirst());
-        if (optionalUser.isEmpty()) {
+                .findFirst()
+                .orElseThrow(()
+                        -> new NoSuchElementException("Can't find user with id: "
+                        + userId)));
+        if (optionalUser.isPresent()) {
             return Storage.users.remove(optionalUser.get());
         }
         return false;

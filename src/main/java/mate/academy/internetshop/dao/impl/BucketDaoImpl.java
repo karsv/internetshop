@@ -54,7 +54,10 @@ public class BucketDaoImpl implements BucketDao {
         Optional<Bucket> optionalBucket = Optional.ofNullable(Storage.buckets
                 .stream()
                 .filter(i -> i.getBucketId().equals(bucketId))
-                .findFirst().get());
+                .findFirst()
+                .orElseThrow(()
+                        -> new NoSuchElementException("Can't find bucket with id: "
+                        + bucketId)));
         if (optionalBucket.isPresent()) {
             Storage.buckets.remove(optionalBucket.get());
             return Storage.buckets.remove(optionalBucket.get());
