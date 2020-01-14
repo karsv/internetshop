@@ -17,7 +17,6 @@ import mate.academy.internetshop.service.OrderService;
 import mate.academy.internetshop.service.UserService;
 
 public class CompleteOrderController extends HttpServlet {
-    private static final Long USER_ID = 1L;
 
     @Inject
     private static BucketService bucketService;
@@ -31,9 +30,10 @@ public class CompleteOrderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        Long userId = (Long) req.getSession(true).getAttribute("userId");
 
-        Bucket bucket = bucketService.getByUserId(USER_ID);
-        User user = userService.get(USER_ID).get();
+        Bucket bucket = bucketService.getByUserId(userId);
+        User user = userService.get(userId).get();
 
         Order order = orderService.completeOrder(bucket.getItems(), user);
         bucketService.delete(bucket);
@@ -43,6 +43,6 @@ public class CompleteOrderController extends HttpServlet {
         req.setAttribute("amount", order.getAmount());
         req.setAttribute("order_id", order.getOrderId());
 
-        req.getRequestDispatcher("WEB-INF/views/order.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/order.jsp").forward(req, resp);
     }
 }
