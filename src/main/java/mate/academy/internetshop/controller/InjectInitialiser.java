@@ -16,6 +16,7 @@ public class InjectInitialiser implements ServletContextListener {
             Injector.injectDependency();
         } catch (IllegalAccessException e) {
             LOGGER.error("Can't initialise dependencies", e);
+            throw new RuntimeException(e);
         }
     }
 
