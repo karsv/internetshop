@@ -8,20 +8,21 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Injector {
     private static final String PROJECT_MAIN_PACKAGE = "mate.academy.internetshop";
+    public static final Logger LOGGER = LogManager.getLogger(Injector.class);
     private static List<Class> classes = new ArrayList<>();
 
     static {
         try {
             classes.addAll(getClasses(PROJECT_MAIN_PACKAGE));
         } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Class not found exception:", e);
+            throw new RuntimeException(e);
         }
-    }
-
-    static {
-
     }
 
     public static void injectDependency() throws IllegalAccessException {
