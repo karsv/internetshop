@@ -13,14 +13,14 @@ import org.apache.logging.log4j.Logger;
 
 public class Injector {
     private static final String PROJECT_MAIN_PACKAGE = "mate.academy.internetshop";
-    public static final Logger logger = LogManager.getLogger(Injector.class);
+    public static final Logger LOGGER = LogManager.getLogger(Injector.class);
     private static List<Class> classes = new ArrayList<>();
 
     static {
         try {
             classes.addAll(getClasses(PROJECT_MAIN_PACKAGE));
         } catch (ClassNotFoundException | IOException e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
     }
 
