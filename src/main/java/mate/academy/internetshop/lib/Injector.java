@@ -21,6 +21,7 @@ public class Injector {
             classes.addAll(getClasses(PROJECT_MAIN_PACKAGE));
         } catch (ClassNotFoundException | IOException e) {
             LOGGER.error("Class not found exception:", e);
+            throw new RuntimeException(e);
         }
     }
 
