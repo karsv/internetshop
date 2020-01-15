@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 
 public class AuthentificationFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(AuthentificationFilter.class);
+    private static final String COOKIE = "MATE";
 
     @Inject
     private static UserService userService;
@@ -40,7 +41,7 @@ public class AuthentificationFilter implements Filter {
         }
 
         for (Cookie cookie : req.getCookies()) {
-            if (cookie.getName().equals("MATE")) {
+            if (cookie.getName().equals(COOKIE)) {
                 Optional<User> user = userService.findByToken(cookie.getValue());
                 if (user.isPresent()) {
                     filterChain.doFilter(servletRequest, servletResponse);
