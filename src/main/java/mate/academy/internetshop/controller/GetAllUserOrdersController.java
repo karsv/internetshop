@@ -24,7 +24,7 @@ public class GetAllUserOrdersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Long userId = (Long) req.getSession(true).getAttribute("userId");
+        Long userId = (Long) req.getSession().getAttribute("userId");
         User user = userService.get(userId).get();
         List<Order> orderList = orderService.getUserOrders(user);
         req.setAttribute("orders", orderList);

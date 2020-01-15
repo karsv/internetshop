@@ -15,11 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class AuthentificationFilter implements Filter {
-    private static final Logger LOGGER = LogManager.getLogger(AuthentificationFilter.class);
     private static final String COOKIE = "MATE";
 
     @Inject

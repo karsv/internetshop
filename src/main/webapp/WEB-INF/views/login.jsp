@@ -12,7 +12,7 @@
     <label for="password">Password</label>
     <input type="password" placeholder="password" id="password" name="password">
 
-    <button type="submit"> Register </button>
+    <button type="submit"> Log In </button>
 </form>
 <br>
 <a href="${pageContext.request.contextPath}/registration">Register User</a>

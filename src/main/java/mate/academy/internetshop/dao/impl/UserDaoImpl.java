@@ -85,10 +85,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findByToken(String token) {
-        Optional<User> user = Storage.users
+        return Storage.users
                 .stream()
                 .filter(u -> u.getToken().equals(token))
                 .findFirst();
-        return user;
     }
 }
