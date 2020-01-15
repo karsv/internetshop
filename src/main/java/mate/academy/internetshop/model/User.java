@@ -4,10 +4,19 @@ public class User {
     private String name;
     private Long userId;
     private String password;
+    private String token;
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getPassword() {

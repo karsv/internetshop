@@ -68,4 +68,21 @@ public class UserDaoImpl implements UserDao {
     public List<User> getAll() {
         return Storage.users;
     }
+
+    @Override
+    public Optional<User> login(String login) {
+        Optional<User> user = Storage.users
+                .stream()
+                .filter(u -> u.getName().equals(login))
+                .findFirst();
+        return user;
+    }
+
+    @Override
+    public Optional<User> findByToken(String token) {
+        return Storage.users
+                .stream()
+                .filter(u -> u.getToken().equals(token))
+                .findFirst();
+    }
 }

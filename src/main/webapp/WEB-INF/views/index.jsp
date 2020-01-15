@@ -10,19 +10,22 @@
 <a href="${pageContext.request.contextPath}/add">Initial Add</a>
 </br>
 <br>
-<a href="${pageContext.request.contextPath}/addItem">Add Item</a>
+<a href="${pageContext.request.contextPath}/servlet/addItem">Add Item</a>
 </br>
 <br>
 <a href="${pageContext.request.contextPath}/registration">Register User</a>
 </br>
 <br>
-<a href="${pageContext.request.contextPath}/allUsers">All users</a>
+<a href="${pageContext.request.contextPath}/login">Login</a>
 </br>
 <br>
-<a href="${pageContext.request.contextPath}/items">Show items</a>
+<a href="${pageContext.request.contextPath}/servlet/allUsers">All users</a>
 </br>
 <br>
-<a href="${pageContext.request.contextPath}/userOrders">Show Orders</a>
+<a href="${pageContext.request.contextPath}/servlet/items">Show items</a>
+</br>
+<br>
+<a href="${pageContext.request.contextPath}/servlet/userOrders">Show Orders</a>
 </br>
 </body>
 </html>

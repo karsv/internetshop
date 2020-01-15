@@ -24,13 +24,13 @@
                 <c:out value="${user.name}"/>
             </td>
             <td>
-                <a href="${pageContext.request.contextPath}/deleteUser?user_id=${user.userId}">Delete</a>
+                <a href="${pageContext.request.contextPath}/servlet/deleteUser?user_id=${user.userId}">Delete</a>
             </td>
         </tr>
     </c:forEach>
 </table>
 <br>
-<a href="${pageContext.request.contextPath}/index"/> Back to main </a>
+<a href="${pageContext.request.contextPath}/servlet/index"/> Back to main </a>
 </br>
 </body>
 </html>

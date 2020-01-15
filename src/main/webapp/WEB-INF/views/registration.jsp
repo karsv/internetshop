@@ -11,6 +11,9 @@
         <label for="password">Password</label>
         <input type="password" placeholder="password" id="password" name="password">
 
+        <label for="passwordRepeat">Repeat Password</label>
+        <input type="password" placeholder="Repeat password" id="passwordRepeat" name="passwordRepeat">
+
         <button type="submit"> Register </button>
     </form>
 </body>
