@@ -51,7 +51,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(String login, String password) throws AuthentificationException {
-        return userDao.login(login, password).get();
+        Optional<User> user = userDao.login(login);
+        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
+            throw new AuthentificationException("Wrong authentification parameters!");
+        }
+        return user.get();
     }
 
     @Override

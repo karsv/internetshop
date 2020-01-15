@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.db.Storage;
-import mate.academy.internetshop.exceptions.AuthentificationException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.GeneratorId;
 import mate.academy.internetshop.model.User;
@@ -71,15 +70,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> login(String login, String password)
-            throws AuthentificationException {
+    public Optional<User> login(String login) {
         Optional<User> user = Storage.users
                 .stream()
                 .filter(u -> u.getName().equals(login))
                 .findFirst();
-        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
-            throw new AuthentificationException("Wrong parameters!");
-        }
         return user;
     }
 
