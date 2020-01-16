@@ -25,7 +25,6 @@ import mate.academy.internetshop.service.UserService;
 public class AuthorizationFilter implements Filter {
     private Map<String, Role.RoleName> protectedUrls = new HashMap<>();
     private static final String COOKIE = "MATE";
-    private static final String EMPTY_STRING = "";
 
     @Inject
     private static UserService userService;
@@ -57,8 +56,7 @@ public class AuthorizationFilter implements Filter {
             return;
         }
 
-        String requestedUrl = req.getRequestURI().replace(req.getContextPath(), EMPTY_STRING);
-        Role.RoleName roleName = protectedUrls.get(requestedUrl);
+        Role.RoleName roleName = protectedUrls.get(req.getServletPath());
         if (roleName == null) {
             processAuthenticated(filterChain, req, resp);
             return;
@@ -94,7 +92,6 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 
     private boolean verifyRole(User user, Role.RoleName roleName) {
