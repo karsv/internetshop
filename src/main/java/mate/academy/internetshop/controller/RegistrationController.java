@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import mate.academy.internetshop.lib.Inject;
+import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
 
@@ -28,13 +29,8 @@ public class RegistrationController extends HttpServlet {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
         User newUser = new User(login, password);
-        User user = userService.create(newUser);
-
-        Cookie cookie = new Cookie("MATE", user.getToken());
-        resp.addCookie(cookie);
-
-        HttpSession httpSession = req.getSession(true);
-        httpSession.setAttribute("userId", user.getUserId());
+        newUser.setRole(Role.of("USER"));
+        userService.create(newUser);
 
         resp.sendRedirect(req.getContextPath() + "/index");
     }

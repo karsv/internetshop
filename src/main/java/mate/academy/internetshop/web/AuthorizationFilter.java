@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -51,42 +52,20 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         HttpServletRequest req = (HttpServletRequest) servletRequest;
 
-        if (req.getCookies() == null) {
-            processUnAuthenticated(req, resp);
-            return;
-        }
-
         Role.RoleName roleName = protectedUrls.get(req.getServletPath());
         if (roleName == null) {
             processAuthenticated(filterChain, req, resp);
             return;
         }
 
-        String token = null;
-        for (Cookie cookie : req.getCookies()) {
-            if (cookie.getName().equals(COOKIE)) {
-                token = cookie.getValue();
-                break;
-            }
-        }
-
-        if (token == null) {
-            processUnAuthenticated(req, resp);
+        Long userId = (Long) req.getSession().getAttribute("userId");
+        User user = userService.get(userId).get();
+        if (verifyRole(user, roleName)) {
+            processAuthenticated(filterChain, req, resp);
             return;
         } else {
-            Optional<User> user = userService.findByToken(token);
-            if (user.isPresent()) {
-                if (verifyRole(user.get(), roleName)) {
-                    processAuthenticated(filterChain, req, resp);
-                    return;
-                } else {
-                    processDenied(req, resp);
-                    return;
-                }
-            } else {
-                processUnAuthenticated(req, resp);
-                return;
-            }
+            processDenied(req, resp);
+            return;
         }
     }
 
@@ -108,10 +87,5 @@ public class AuthorizationFilter implements Filter {
                                       HttpServletResponse resp)
             throws IOException, ServletException {
         chain.doFilter(req, resp);
-    }
-
-    private void processUnAuthenticated(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-        resp.sendRedirect(req.getContextPath() + "/login");
     }
 }
