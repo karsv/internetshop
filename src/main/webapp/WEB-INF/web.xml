@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-    
+
     <listener>
         <listener-class>mate.academy.internetshop.controller.InjectInitialiser</listener-class>
     </listener>
-    
+
     <servlet>
         <servlet-name>index</servlet-name>
         <servlet-class>mate.academy.internetshop.controller.IndexController</servlet-class>
@@ -135,6 +135,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>logout</servlet-name>
+        <servlet-class>mate.academy.internetshop.controller.LogoutController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>logout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>allUsers</servlet-name>
         <servlet-class>mate.academy.internetshop.controller.GetAllUsersController</servlet-class>
     </servlet>
@@ -160,4 +169,15 @@
         <filter-name>auth-filter</filter-name>
         <url-pattern>/servlet/*</url-pattern>
     </filter-mapping>
+
+    <filter>
+        <filter-name>role-filter</filter-name>
+        <filter-class>mate.academy.internetshop.web.AuthorizationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>role-filter</filter-name>
+        <url-pattern>/servlet/*</url-pattern>
+    </filter-mapping>
+
+
 </web-app>

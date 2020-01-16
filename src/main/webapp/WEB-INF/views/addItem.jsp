@@ -5,7 +5,7 @@
 </head>
 <body>
 <form action="${pageContext.request.contextPath}/servlet/addItem" method="post">
-    <label for="name">Login</label>
+    <label for="name">Name</label>
     <input type="text" placeholder="Item's name" id="name" name="name">
 
     <label for="cost">Cost</label>
