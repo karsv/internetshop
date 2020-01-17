@@ -19,6 +19,9 @@
 <a href="${pageContext.request.contextPath}/login">Login</a>
 </br>
 <br>
+<a href="${pageContext.request.contextPath}/logout">Logout</a>
+</br>
+<br>
 <a href="${pageContext.request.contextPath}/servlet/allUsers">All users</a>
 </br>
 <br>
