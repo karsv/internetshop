@@ -65,7 +65,6 @@ public class AuthorizationFilter implements Filter {
             return;
         } else {
             processDenied(req, resp);
-            return;
         }
     }
 
