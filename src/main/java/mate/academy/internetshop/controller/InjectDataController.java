@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Item;
-import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.ItemService;
@@ -41,13 +40,13 @@ public class InjectDataController extends HttpServlet {
         itemService.create(item4);
         itemService.create(item5);
 
-        User user = new User("Admin", "123");
-        user.setRole(Role.of("ADMIN"));
-        User user1 = new User("User", "123");
-        user1.setRole(Role.of("USER"));
+        User user = new User("User 1", "123");
+        User user1 = new User("User 2", "123");
+        User user2 = new User("User 3", "123");
 
         userService.create(user);
         userService.create(user1);
+        userService.create(user2);
 
         resp.sendRedirect(req.getContextPath() + "/index");
     }
