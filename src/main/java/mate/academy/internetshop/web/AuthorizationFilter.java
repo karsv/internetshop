@@ -54,14 +54,14 @@ public class AuthorizationFilter implements Filter {
 
         Role.RoleName roleName = protectedUrls.get(req.getServletPath());
         if (roleName == null) {
-            processAuthenticated(filterChain, req, resp);
+            filterChain.doFilter(req, resp);
             return;
         }
 
         Long userId = (Long) req.getSession().getAttribute("userId");
         User user = userService.get(userId).get();
         if (verifyRole(user, roleName)) {
-            processAuthenticated(filterChain, req, resp);
+            filterChain.doFilter(req, resp);
             return;
         } else {
             processDenied(req, resp);
@@ -81,11 +81,5 @@ public class AuthorizationFilter implements Filter {
     private void processDenied(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.getRequestDispatcher("/WEB-INF/views/denied.jsp").forward(req, resp);
-    }
-
-    private void processAuthenticated(FilterChain chain, HttpServletRequest req,
-                                      HttpServletResponse resp)
-            throws IOException, ServletException {
-        chain.doFilter(req, resp);
     }
 }
