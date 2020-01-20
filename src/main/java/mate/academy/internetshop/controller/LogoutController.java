@@ -21,5 +21,6 @@ public class LogoutController extends HttpServlet {
         resp.addCookie(cookie);
 
         resp.sendRedirect(req.getContextPath() + "/index");
+
     }
 }
