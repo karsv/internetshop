@@ -6,7 +6,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class LogoutController extends HttpServlet {
     private static final String COOKIE = "MATE";
@@ -17,9 +16,12 @@ public class LogoutController extends HttpServlet {
         HttpSession session = req.getSession();
         session.removeAttribute("userId");
 
-        Cookie cookie = new Cookie(COOKIE, null);
-        cookie.setMaxAge(0);
-        resp.addCookie(cookie);
+        for (Cookie cookie : req.getCookies()) {
+            if (cookie.getName().equals(COOKIE)) {
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
+            }
+        }
 
         resp.sendRedirect(req.getContextPath() + "/index");
     }

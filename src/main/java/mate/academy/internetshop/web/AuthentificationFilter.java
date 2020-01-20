@@ -2,6 +2,7 @@ package mate.academy.internetshop.web;
 
 import java.io.IOException;
 import java.util.Optional;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
