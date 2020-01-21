@@ -178,6 +178,4 @@
         <filter-name>role-filter</filter-name>
         <url-pattern>/servlet/*</url-pattern>
     </filter-mapping>
-
-
 </web-app>
