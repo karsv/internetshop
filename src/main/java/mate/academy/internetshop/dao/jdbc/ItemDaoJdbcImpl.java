@@ -25,21 +25,20 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
 
     @Override
     public Item create(Item entity) {
-        String query = "INSERT INTO " + TABLE + "(name, price) VALUES('"
-                + entity.getName() + "', " + entity.getPrice() + ")";
+        String query = String.format("INSERT INTO %s(name, price) VALUES('%s', %f)",
+                TABLE, entity.getName(), entity.getPrice());
 
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
-            LOGGER.warn("Can't create item" + entity.toString());
-            LOGGER.warn("Exception was", e);
+            LOGGER.warn("Can't create item" + entity.toString(), e);
         }
         return entity;
     }
 
     @Override
     public Optional<Item> get(Long entityId) {
-        String query = "SELECT * FROM " + TABLE + " WHERE item_id=" + entityId;
+        String query = String.format("SELECT * FROM %s WHERE item_id=%d", TABLE, entityId);
 
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
@@ -50,22 +49,20 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 return Optional.of(item);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get item bi ID" + entityId);
-            LOGGER.warn("Exception was", e);
+            LOGGER.warn("Can't get item bi ID" + entityId, e);
         }
         return Optional.empty();
     }
 
     @Override
     public Item update(Item entity) {
-        String query = "UPDATE items SET name='" + entity.getName() + "', price="
-                + entity.getPrice() + " WHERE item_id=" + entity.getItemId();
+        String query = String.format("UPDATE items SET name='%s', price=%f WHERE item_id=%d",
+                entity.getName(), entity.getPrice(), entity.getItemId());
 
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
-            LOGGER.warn("Can't update item" + entity.toString());
-            LOGGER.warn("Exception was", e);
+            LOGGER.warn("Can't update item" + entity.toString(), e);
         }
         return entity;
     }
@@ -74,12 +71,11 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     public boolean deleteById(Long entityId) {
         Optional<Item> item = get(entityId);
         if (item.isPresent()) {
-            String query = "DELETE FROM items WHERE item_id=" + entityId;
+            String query = String.format("DELETE FROM items WHERE item_id=%d", entityId);
             try (Statement stmt = connection.createStatement()) {
                 stmt.executeUpdate(query);
             } catch (SQLException e) {
-                LOGGER.warn("Can't create item" + entityId);
-                LOGGER.warn("Exception was", e);
+                LOGGER.warn("Can't create item" + entityId, e);
             }
             return true;
         }
@@ -90,12 +86,11 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     public boolean delete(Item entity) {
         Optional<Item> item = get(entity.getItemId());
         if (item.isPresent()) {
-            String query = "DELETE FROM items WHERE item_id=" + entity.getItemId();
+            String query = String.format("DELETE FROM items WHERE item_id=%d", entity.getItemId());
             try (Statement stmt = connection.createStatement()) {
                 stmt.executeUpdate(query);
             } catch (SQLException e) {
-                LOGGER.warn("Can't create item" + entity.getItemId());
-                LOGGER.warn("Exception was", e);
+                LOGGER.warn("Can't create item" + entity.getItemId(), e);
             }
             return true;
         }
@@ -105,7 +100,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     @Override
     public List<Item> getAll() {
         List<Item> list = new ArrayList<>();
-        String query = "SELECT * FROM " + TABLE;
+        String query = String.format("SELECT * FROM %s", TABLE);
 
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
@@ -116,8 +111,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 list.add(item);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get items");
-            LOGGER.warn("Exception was", e);
+            LOGGER.warn("Can't get items", e);
         }
         return list;
     }
