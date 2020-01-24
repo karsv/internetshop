@@ -20,7 +20,7 @@ public class GetAllItemsFromBucketController extends HttpServlet {
             throws ServletException, IOException {
         Long userId = (Long) req.getSession().getAttribute("userId");
         Bucket bucket = bucketService.getByUserId(userId);
-        bucketService.create(bucket);
+        bucketService.update(bucket);
 
         req.setAttribute("bucket", bucket);
 

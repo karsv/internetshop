@@ -36,7 +36,7 @@ public class CompleteOrderController extends HttpServlet {
         User user = userService.get(userId).get();
 
         Order order = orderService.completeOrder(bucket.getItems(), user);
-        bucketService.delete(bucket);
+        bucketService.clear(bucket);
 
         List<Item> itemList = orderService.get(order.getOrderId()).get().getItems();
         req.setAttribute("items", itemList);

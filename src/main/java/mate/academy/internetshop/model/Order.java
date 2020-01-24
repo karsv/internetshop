@@ -9,6 +9,9 @@ public class Order {
     private Long userId;
     private List<Item> items;
 
+    public Order() {
+    }
+
     public Order(List<Item> items, Long userId) {
         this.items = items;
         this.amount = countAmoutn(items);

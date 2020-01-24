@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class User {
-    private String name;
     private Long userId;
+    private String name;
     private String password;
     private String token;
     private Set<Role> roles  = new HashSet<>();

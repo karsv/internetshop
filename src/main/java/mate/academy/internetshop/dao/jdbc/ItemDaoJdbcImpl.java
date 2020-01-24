@@ -1,9 +1,9 @@
 package mate.academy.internetshop.dao.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
         String query = String.format("INSERT INTO %s(name, price) VALUES('%s', %f)",
                 TABLE, entity.getName(), entity.getPrice());
 
-        try (Statement stmt = connection.createStatement()) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
             LOGGER.warn("Can't create item" + entity.toString(), e);
@@ -40,7 +40,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     public Optional<Item> get(Long entityId) {
         String query = String.format("SELECT * FROM %s WHERE item_id=%d", TABLE, entityId);
 
-        try (Statement stmt = connection.createStatement()) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Item item = new Item(rs.getString("name"),
@@ -58,8 +58,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     public Item update(Item entity) {
         String query = String.format("UPDATE items SET name='%s', price=%f WHERE item_id=%d",
                 entity.getName(), entity.getPrice(), entity.getItemId());
-
-        try (Statement stmt = connection.createStatement()) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
             LOGGER.warn("Can't update item" + entity.toString(), e);
@@ -72,7 +71,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
         Optional<Item> item = get(entityId);
         if (item.isPresent()) {
             String query = String.format("DELETE FROM items WHERE item_id=%d", entityId);
-            try (Statement stmt = connection.createStatement()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.executeUpdate(query);
             } catch (SQLException e) {
                 LOGGER.warn("Can't create item" + entityId, e);
@@ -87,7 +86,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
         Optional<Item> item = get(entity.getItemId());
         if (item.isPresent()) {
             String query = String.format("DELETE FROM items WHERE item_id=%d", entity.getItemId());
-            try (Statement stmt = connection.createStatement()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.executeUpdate(query);
             } catch (SQLException e) {
                 LOGGER.warn("Can't create item" + entity.getItemId(), e);
@@ -102,7 +101,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
         List<Item> list = new ArrayList<>();
         String query = String.format("SELECT * FROM %s", TABLE);
 
-        try (Statement stmt = connection.createStatement()) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Item item = new Item(rs.getString("name"),
