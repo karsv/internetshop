@@ -113,10 +113,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
         Long roleId = null;
         for (Role role : user.getRoles()) {
-            query = String.format("SELECT id FROM %s WHERE role_name='%s'",
-                    ROLES_TABLE, role.getRoleName().toString());
+            query = String.format("SELECT id FROM %s WHERE role_name=?",
+                    ROLES_TABLE);
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery(query);
+                stmt.setString(1, role.getRoleName().toString());
+                ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     roleId = rs.getLong("id");
                     role.setId(roleId);
@@ -125,10 +126,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 LOGGER.warn("Can't get role id" + entity.toString(), e);
             }
 
-            query = String.format("INSERT INTO %s(user_id, role_id) VALUES(%d, %d)",
+            query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
                     USER_ROLES_TABLE, user.getUserId(), roleId);
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.executeUpdate(query);
+                stmt.setLong(1, user.getUserId());
+                stmt.setLong(2, roleId);
+                stmt.executeUpdate();
             } catch (SQLException e) {
                 LOGGER.warn("Can't get role id" + entity.toString(), e);
 
@@ -143,10 +146,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.id=user_roles.user_id "
                         + "INNER JOIN %s "
-                        + "ON user_roles.role_id = roles.id WHERE users.id=%d",
-                USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE, userId);
+                        + "ON user_roles.role_id = roles.id WHERE users.id=?",
+                USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery(query);
+            stmt.setLong(1, userId);
+            ResultSet rs = stmt.executeQuery();
             User user = null;
             while (rs.next()) {
                 user = new User(rs.getString("name"), rs.getString("password"));
@@ -177,20 +181,22 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             LOGGER.warn("Can't update user", e);
         }
 
-        query = String.format("DELETE FROM %s WHERE user_id=%d",
-                USER_ROLES_TABLE, newUser.getUserId());
+        query = String.format("DELETE FROM %s WHERE user_id=?",
+                USER_ROLES_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.executeUpdate(query);
+            ps.setLong(1, newUser.getUserId());
+            ps.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("Can't delete roles", e);
         }
 
         Long roleId = 1L;
         for (Role role : user.getRoles()) {
-            query = String.format("SELECT id FROM %s WHERE role_name='%s'",
+            query = String.format("SELECT id FROM %s WHERE role_name=?",
                     ROLES_TABLE, role.getRoleName().toString());
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery(query);
+                stmt.setString(1, role.getRoleName().toString());
+                ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     roleId = rs.getLong("id");
                 }
@@ -198,10 +204,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 LOGGER.warn("Can't get role id" + user.toString(), e);
             }
 
-            query = String.format("INSERT INTO %s(user_id, role_id) VALUES(%d, %d)",
-                    USER_ROLES_TABLE, newUser.getUserId(), roleId);
+            query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
+                    USER_ROLES_TABLE);
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.executeUpdate(query);
+                stmt.setLong(1, newUser.getUserId());
+                stmt.setLong(2, roleId);
+                stmt.executeUpdate();
             } catch (SQLException e) {
                 LOGGER.warn("Can't get role id" + user.toString(), e);
 
@@ -212,10 +220,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public boolean deleteById(Long userId) {
-        String query = String.format("SELECT order_id FROM %s WHERE user_id=%d",
-                ORDERS_TABLE, userId);
+        String query = String.format("SELECT order_id FROM %s WHERE user_id=?",
+                ORDERS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ResultSet rs = ps.executeQuery(query);
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
             List<Long> listUserOrdersId = new ArrayList<>();
             while (rs.next()) {
                 listUserOrdersId.add(rs.getLong(1));
@@ -227,10 +236,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             LOGGER.warn("Can't clean User orders", e);
         }
 
-        query = String.format("SELECT bucket_id FROM %s WHERE user_id=%d",
-                BUCKETS_TABLE, userId);
+        query = String.format("SELECT bucket_id FROM %s WHERE user_id=?",
+                BUCKETS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ResultSet rs = ps.executeQuery(query);
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
             List<Long> listUserBucketsId = new ArrayList<>();
             while (rs.next()) {
                 listUserBucketsId.add(rs.getLong(1));
@@ -242,18 +252,20 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             LOGGER.warn("Can't clean User orders", e);
         }
 
-        query = String.format("DELETE FROM %s WHERE user_id=%d",
-                USER_ROLES_TABLE, userId);
+        query = String.format("DELETE FROM %s WHERE user_id=?",
+                USER_ROLES_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.executeUpdate(query);
+            ps.setLong(1, userId);
+            ps.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("Can't delete roles for user", e);
         }
 
-        query = String.format("DELETE FROM %s WHERE id=%d",
-                USER_TABLE, userId);
+        query = String.format("DELETE FROM %s WHERE id=?",
+                USER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.executeUpdate(query);
+            ps.setLong(1, userId);
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             LOGGER.warn("Can't delete user by ID", e);

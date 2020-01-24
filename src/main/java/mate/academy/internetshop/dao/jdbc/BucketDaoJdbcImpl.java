@@ -67,9 +67,10 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
                         + "items.item_id, items.name, items.price FROM %s "
                         + "LEFT JOIN %s ON bucket.bucket_id = bucket_item.bucket_id "
                         + "LEFT JOIN %s ON bucket_item.item_id = items.item_id "
-                        + "WHERE bucket.bucket_id=%d;", BUCKET_TABLE, BUCKET_ITEMS_TABLE,
-                ITEMS_TABLE, bucketId);
+                        + "WHERE bucket.bucket_id=?;", BUCKET_TABLE, BUCKET_ITEMS_TABLE,
+                ITEMS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, bucketId);
             ResultSet resultSet = ps.executeQuery();
             Bucket bucket = null;
             List<Item> bucketItems = new ArrayList<>();
@@ -94,9 +95,10 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
 
     @Override
     public Bucket update(Bucket entity) {
-        String query = String.format("DELETE FROM %s WHERE bucket_id=%d",
-                BUCKET_ITEMS_TABLE, entity.getBucketId());
+        String query = String.format("DELETE FROM %s WHERE bucket_id=?",
+                BUCKET_ITEMS_TABLE);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setLong(1, entity.getBucketId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("Can't update bucket", e);
@@ -118,19 +120,21 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
 
     @Override
     public boolean deleteById(Long bucketId) {
-        String query = String.format("DELETE FROM %s WHERE bucket_id=%d",
-                BUCKET_ITEMS_TABLE, bucketId);
+        String query = String.format("DELETE FROM %s WHERE bucket_id=?",
+                BUCKET_ITEMS_TABLE);
 
-        try (Statement ps = connection.createStatement()) {
-            ps.executeUpdate(query);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, bucketId);
+            ps.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("Can't delete bucket by ID", e);
         }
 
-        query = String.format("DELETE FROM %s WHERE bucket_id=%d",
-                BUCKET_TABLE, bucketId);
-        try (Statement ps = connection.createStatement()) {
-            ps.executeUpdate(query);
+        query = String.format("DELETE FROM %s WHERE bucket_id=?",
+                BUCKET_TABLE);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, bucketId);
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             LOGGER.warn("Can't delete bucket by ID", e);

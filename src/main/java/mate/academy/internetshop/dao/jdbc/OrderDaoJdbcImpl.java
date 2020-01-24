@@ -96,9 +96,10 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
 
     @Override
     public Order update(Order order) {
-        String query = String.format("DELETE FROM %s WHERE order_id=%d",
-                ORDER_ITEMS_TABLE, order.getOrderId());
+        String query = String.format("DELETE FROM %s WHERE order_id=?",
+                ORDER_ITEMS_TABLE);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setLong(1, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("Can't update order 1", e);
@@ -130,18 +131,20 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
 
     @Override
     public boolean deleteById(Long orderId) {
-        String query = String.format("DELETE FROM %s WHERE order_id =%d",
-                ORDER_ITEMS_TABLE, orderId);
+        String query = String.format("DELETE FROM %s WHERE order_id =?",
+                ORDER_ITEMS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            int rows = ps.executeUpdate(query);
+            ps.setLong(1, orderId);
+            int rows = ps.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warn("1 Can't delete order by ID", e);
         }
 
-        query = String.format("DELETE FROM %s WHERE order_id =%d",
-                ORDER_TABLE, orderId);
+        query = String.format("DELETE FROM %s WHERE order_id =?",
+                ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            int rows = ps.executeUpdate(query);
+            ps.setLong(1, orderId);
+            int rows = ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             LOGGER.warn("2 Can't delete order by ID", e);
