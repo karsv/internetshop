@@ -9,14 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.ItemDao;
+import mate.academy.internetshop.exceptions.JdbcDaoException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Item;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Dao
 public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
-    private static final Logger LOGGER = LogManager.getLogger(ItemDaoJdbcImpl.class);
     private static String TABLE = "items";
 
     public ItemDaoJdbcImpl(Connection connection) {
@@ -24,7 +22,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public Item create(Item entity) {
+    public Item create(Item entity) throws JdbcDaoException {
         String query = String.format("INSERT INTO %s(name, price) VALUES(?, ?)",
                 TABLE, entity.getName(), entity.getPrice());
 
@@ -33,13 +31,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
             stmt.setBigDecimal(2, entity.getPrice());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't create item" + entity.toString(), e);
+            throw new JdbcDaoException("Can't create item");
         }
         return entity;
     }
 
     @Override
-    public Optional<Item> get(Long itemId) {
+    public Optional<Item> get(Long itemId) throws JdbcDaoException {
         String query = String.format("SELECT * FROM %s WHERE item_id=?", TABLE);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -52,13 +50,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 return Optional.of(item);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get item bi ID" + itemId, e);
+            throw new JdbcDaoException("Can't item bu id");
         }
         return Optional.empty();
     }
 
     @Override
-    public Item update(Item entity) {
+    public Item update(Item entity) throws JdbcDaoException {
         String query = "UPDATE items SET name=?, price=? WHERE item_id=?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, entity.getName());
@@ -66,13 +64,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
             stmt.setLong(3, entity.getItemId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't update item" + entity.toString(), e);
+            throw new JdbcDaoException("Can't update item");
         }
         return entity;
     }
 
     @Override
-    public boolean deleteById(Long longId) {
+    public boolean deleteById(Long longId) throws JdbcDaoException {
         Optional<Item> item = get(longId);
         if (item.isPresent()) {
             String query = String.format("DELETE FROM items WHERE item_id=?", longId);
@@ -80,7 +78,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 stmt.setLong(1, longId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.warn("Can't delete item by ID" + longId, e);
+                throw new JdbcDaoException("Can't delete item by id");
             }
             return true;
         }
@@ -88,13 +86,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public boolean delete(Item entity) {
+    public boolean delete(Item entity) throws JdbcDaoException {
         deleteById(entity.getItemId());
         return false;
     }
 
     @Override
-    public List<Item> getAll() {
+    public List<Item> getAll() throws JdbcDaoException {
         List<Item> list = new ArrayList<>();
         String query = String.format("SELECT * FROM %s", TABLE);
 
@@ -107,7 +105,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 list.add(item);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get items", e);
+            throw new JdbcDaoException("Can't get all items");
         }
         return list;
     }

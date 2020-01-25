@@ -1,6 +1,7 @@
 package mate.academy.internetshop.controller;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -9,11 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import mate.academy.internetshop.exceptions.AuthentificationException;
+import mate.academy.internetshop.exceptions.JdbcDaoException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LoginController extends HttpServlet {
+    private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
+
     @Inject
     private static UserService userService;
 
@@ -38,6 +44,8 @@ public class LoginController extends HttpServlet {
         } catch (AuthentificationException e) {
             req.setAttribute("errorMsg", "Wrong parameters!");
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+        } catch (JdbcDaoException e) {
+            LOGGER.warn("Can't login user", e);
         }
     }
 }

@@ -11,15 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.OrderDao;
+import mate.academy.internetshop.exceptions.JdbcDaoException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Item;
 import mate.academy.internetshop.model.Order;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Dao
 public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
-    private static final Logger LOGGER = LogManager.getLogger(OrderDaoJdbcImpl.class);
     private static String ORDER_TABLE = "orders";
     private static String ORDER_ITEMS_TABLE = "order_items";
     private static String ITEMS_TABLE = "items";
@@ -29,7 +27,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
     }
 
     @Override
-    public Order create(Order order) {
+    public Order create(Order order) throws JdbcDaoException {
         Order newOrder = order;
         String query = String.format("INSERT INTO %s (user_id, amount) VALUES(?, ?)", ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query,
@@ -45,7 +43,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't create order", e);
+            throw new JdbcDaoException("Can't create order");
         }
 
         for (Item item : newOrder.getItems()) {
@@ -56,7 +54,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 ps.setLong(2, item.getItemId());
                 int rows = ps.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.warn("Can't add items from order to order_item", e);
+                throw new JdbcDaoException("Can't add items by order_id to order_items");
             }
         }
 
@@ -64,7 +62,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
     }
 
     @Override
-    public Optional<Order> get(Long orderId) {
+    public Optional<Order> get(Long orderId) throws JdbcDaoException {
         String query = String.format("SELECT orders.order_id, orders.user_id, orders.amount, "
                 + "items.item_id, items.name, items.price "
                 + "FROM %s LEFT JOIN %s ON orders.order_id = order_items.order_id "
@@ -89,20 +87,19 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             order.setItems(itemList);
             return Optional.of(order);
         } catch (SQLException e) {
-            LOGGER.warn("Can't get order by ID", e);
+            throw new JdbcDaoException("Can't get order by id");
         }
-        return Optional.empty();
     }
 
     @Override
-    public Order update(Order order) {
+    public Order update(Order order) throws JdbcDaoException {
         String query = String.format("DELETE FROM %s WHERE order_id=?",
                 ORDER_ITEMS_TABLE);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't update order 1", e);
+            throw new JdbcDaoException("Can't delete orders items due update from order_items");
         }
 
         query = String.format("INSERT INTO %s(order_id, item_id) VALUE(?, ?)",
@@ -113,7 +110,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 ps.setLong(2, item.getItemId());
                 int rows = ps.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.warn("Can't update order 2", e);
+                throw new JdbcDaoException("Can't insert new items to order_items due update");
             }
         }
 
@@ -124,20 +121,21 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             ps.setLong(2, order.getOrderId());
             int rows = ps.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't update order 3", e);
+            throw new JdbcDaoException("Can't update order");
         }
         return order;
     }
 
     @Override
-    public boolean deleteById(Long orderId) {
+    public boolean deleteById(Long orderId) throws JdbcDaoException {
         String query = String.format("DELETE FROM %s WHERE order_id =?",
                 ORDER_ITEMS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, orderId);
             int rows = ps.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("1 Can't delete order by ID", e);
+            throw new JdbcDaoException("Can't delete orders items due delete "
+                    + "Order from order_items");
         }
 
         query = String.format("DELETE FROM %s WHERE order_id =?",
@@ -147,18 +145,17 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             int rows = ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            LOGGER.warn("2 Can't delete order by ID", e);
+            throw new JdbcDaoException("Can't delete order");
         }
-        return false;
     }
 
     @Override
-    public boolean delete(Order order) {
+    public boolean delete(Order order) throws JdbcDaoException {
         return deleteById(order.getOrderId());
     }
 
     @Override
-    public List<Order> getAll() {
+    public List<Order> getAll() throws JdbcDaoException {
         List<Order> tempOrders = new ArrayList<>();
         String query = String.format("SELECT order_id, user_id, amount FROM %s",
                 ORDER_TABLE);
@@ -176,7 +173,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 tempOrders.add(order);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get all orders", e);
+            throw new JdbcDaoException("Can't get all orders");
         }
 
         List<Order> orders = new ArrayList<>();

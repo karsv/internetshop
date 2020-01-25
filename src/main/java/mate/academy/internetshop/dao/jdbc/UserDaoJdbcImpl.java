@@ -12,16 +12,14 @@ import java.util.Optional;
 import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.dao.OrderDao;
 import mate.academy.internetshop.dao.UserDao;
+import mate.academy.internetshop.exceptions.JdbcDaoException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Dao
 public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
-    private static final Logger LOGGER = LogManager.getLogger(ItemDaoJdbcImpl.class);
     private static String USER_TABLE = "users";
     private static String ROLES_TABLE = "roles";
     private static String USER_ROLES_TABLE = "user_roles";
@@ -39,7 +37,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    public Optional<User> login(String login) {
+    public Optional<User> login(String login) throws JdbcDaoException {
         String query = String.format("SELECT users.id AS userId, name, password, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.id=user_roles.user_id "
@@ -60,13 +58,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             }
             return Optional.of(user);
         } catch (SQLException ex) {
-            LOGGER.warn("Can't login", ex);
+            throw new JdbcDaoException("Can't login user");
         }
-        return Optional.empty();
     }
 
     @Override
-    public Optional<User> findByToken(String token) {
+    public Optional<User> findByToken(String token) throws JdbcDaoException {
         String query = String.format("SELECT users.id AS userId, name, password, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.id=user_roles.user_id "
@@ -87,13 +84,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             }
             return Optional.of(user);
         } catch (SQLException ex) {
-            LOGGER.warn("Can't get user bu token", ex);
+            throw new JdbcDaoException("Can't find user by token");
         }
-        return Optional.empty();
     }
 
     @Override
-    public User create(User entity) {
+    public User create(User entity) throws JdbcDaoException {
         User user = entity;
         String query = String.format("INSERT INTO %s(name, password, token) VALUE(?, ?, ?)",
                 USER_TABLE);
@@ -108,7 +104,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 user.setUserId(resultSet.getLong(1));
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't create user", e);
+            throw new JdbcDaoException("Can't create new user");
         }
 
         Long roleId = null;
@@ -123,7 +119,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                     role.setId(roleId);
                 }
             } catch (SQLException e) {
-                LOGGER.warn("Can't get role id" + entity.toString(), e);
+                throw new JdbcDaoException("Can't get roles id");
             }
 
             query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
@@ -133,15 +129,14 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 stmt.setLong(2, roleId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.warn("Can't get role id" + entity.toString(), e);
-
+                throw new JdbcDaoException("Can't insert roles for new user");
             }
         }
         return user;
     }
 
     @Override
-    public Optional<User> get(Long userId) {
+    public Optional<User> get(Long userId) throws JdbcDaoException {
         String query = String.format("SELECT users.id AS userId, name, password, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.id=user_roles.user_id "
@@ -162,13 +157,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             }
             return Optional.of(user);
         } catch (SQLException e) {
-            LOGGER.warn("Can't get user", e);
+            throw new JdbcDaoException("Can't get user by id");
         }
-        return Optional.empty();
     }
 
     @Override
-    public User update(User user) {
+    public User update(User user) throws JdbcDaoException {
         User newUser = user;
         String query = String.format("UPDATE %s(name, password, token) VALUE(?, ?, ?)",
                 USER_TABLE);
@@ -178,7 +172,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             ps.setString(3, user.getToken());
             ps.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't update user", e);
+            throw new JdbcDaoException("Can't update user");
         }
 
         query = String.format("DELETE FROM %s WHERE user_id=?",
@@ -187,7 +181,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             ps.setLong(1, newUser.getUserId());
             ps.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't delete roles", e);
+            throw new JdbcDaoException("Can't delete users role due update");
         }
 
         Long roleId = 1L;
@@ -201,7 +195,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                     roleId = rs.getLong("id");
                 }
             } catch (SQLException e) {
-                LOGGER.warn("Can't get role id" + user.toString(), e);
+                throw new JdbcDaoException("Can't get role id");
             }
 
             query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
@@ -211,15 +205,14 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 stmt.setLong(2, roleId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.warn("Can't get role id" + user.toString(), e);
-
+                throw new JdbcDaoException("Can't update user roles");
             }
         }
         return newUser;
     }
 
     @Override
-    public boolean deleteById(Long userId) {
+    public boolean deleteById(Long userId) throws JdbcDaoException {
         String query = String.format("SELECT order_id FROM %s WHERE user_id=?",
                 ORDERS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -233,7 +226,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 orderDao.deleteById(orderId);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't clean User orders", e);
+            throw new JdbcDaoException("Can't delete user orders by userId due delete user");
         }
 
         query = String.format("SELECT bucket_id FROM %s WHERE user_id=?",
@@ -249,7 +242,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 bucketDao.deleteById(bucketId);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't clean User orders", e);
+            throw new JdbcDaoException("Can't delete user bucket by userId due delete user");
         }
 
         query = String.format("DELETE FROM %s WHERE user_id=?",
@@ -258,7 +251,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             ps.setLong(1, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.warn("Can't delete roles for user", e);
+            throw new JdbcDaoException("Can't delete user role by userId due delete user");
         }
 
         query = String.format("DELETE FROM %s WHERE id=?",
@@ -268,19 +261,18 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            LOGGER.warn("Can't delete user by ID", e);
+            throw new JdbcDaoException("Can't delete user");
         }
-        return false;
     }
 
     @Override
-    public boolean delete(User entity) {
+    public boolean delete(User entity) throws JdbcDaoException {
         deleteById(entity.getUserId());
         return true;
     }
 
     @Override
-    public List<User> getAll() {
+    public List<User> getAll() throws JdbcDaoException {
         List<User> list = new ArrayList<>();
         String query = String.format("SELECT * FROM %s",
                 USER_TABLE);
@@ -295,7 +287,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 list.add(user);
             }
         } catch (SQLException e) {
-            LOGGER.warn("Can't get all users", e);
+            throw new JdbcDaoException("Can't get all users");
         }
         return list;
     }
