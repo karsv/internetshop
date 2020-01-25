@@ -15,7 +15,9 @@ import mate.academy.internetshop.model.Item;
 
 @Dao
 public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
-    private static String TABLE = "items";
+    private static String ITEMS_TABLE = "items";
+    private static String BUCKET_ITEM_TABLE = "bucket_item";
+    private static String ORDER_ITEM_TABLE = "order_items";
 
     public ItemDaoJdbcImpl(Connection connection) {
         super(connection);
@@ -24,7 +26,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     @Override
     public Item create(Item entity) throws JdbcDaoException {
         String query = String.format("INSERT INTO %s(name, price) VALUES(?, ?)",
-                TABLE, entity.getName(), entity.getPrice());
+                ITEMS_TABLE, entity.getName(), entity.getPrice());
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, entity.getName());
@@ -38,7 +40,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
 
     @Override
     public Optional<Item> get(Long itemId) throws JdbcDaoException {
-        String query = String.format("SELECT * FROM %s WHERE item_id=?", TABLE);
+        String query = String.format("SELECT * FROM %s WHERE item_id=?", ITEMS_TABLE);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, itemId);
@@ -73,7 +75,23 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     public boolean deleteById(Long longId) throws JdbcDaoException {
         Optional<Item> item = get(longId);
         if (item.isPresent()) {
-            String query = String.format("DELETE FROM items WHERE item_id=?", longId);
+            String query = String.format("DELETE FROM %s WHERE item_id=?", BUCKET_ITEM_TABLE);
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setLong(1, longId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new JdbcDaoException("Can't delete item by id in bucket_item");
+            }
+
+            query = String.format("DELETE FROM %s WHERE item_id=?", ORDER_ITEM_TABLE);
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setLong(1, longId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new JdbcDaoException("Can't delete item by id in order_item");
+            }
+
+            query = String.format("DELETE FROM %s WHERE item_id=?", ITEMS_TABLE);
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setLong(1, longId);
                 stmt.executeUpdate();
@@ -94,7 +112,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     @Override
     public List<Item> getAll() throws JdbcDaoException {
         List<Item> list = new ArrayList<>();
-        String query = String.format("SELECT * FROM %s", TABLE);
+        String query = String.format("SELECT * FROM %s", ITEMS_TABLE);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
