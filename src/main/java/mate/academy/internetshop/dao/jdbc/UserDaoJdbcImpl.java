@@ -39,11 +39,10 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> login(String login) throws DataProcessingException {
-        String query = String.format("SELECT users.id AS userId, name, password, token, "
+        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
-                        + "ON users.id=user_roles.user_id "
-                        + "INNER JOIN %s "
-                        + "ON user_roles.role_id = roles.id WHERE users.name=?",
+                        + "ON users.user_id=user_roles.user_id "
+                        + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.name=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, login);
@@ -57,11 +56,10 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> findByToken(String token) throws DataProcessingException {
-        String query = String.format("SELECT users.id AS userId, name, password, token, "
-                        + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
-                        + "ON users.id=user_roles.user_id "
-                        + "INNER JOIN %s "
-                        + "ON user_roles.role_id = roles.id WHERE users.token=?",
+        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
+                + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
+                + "ON users.user_id=user_roles.user_id "
+                + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, token);
@@ -105,11 +103,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             throw new DataProcessingException("Can't create new user", e);
         }
 
-        user.setRoles(setUserRoles(user));
+        user.setRoles(getUserRoles(user));
         return user;
     }
 
-    private Set<Role> setUserRoles(User user) throws DataProcessingException {
+    private Set<Role> getUserRoles(User user) throws DataProcessingException {
         Set<Role> roles = user.getRoles();
         for (Role role : roles) {
             String query = String.format("SELECT id FROM %s WHERE role_name=?",
@@ -139,24 +137,15 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> get(Long userId) throws DataProcessingException {
-        String query = String.format("SELECT users.id AS userId, name, password, token, "
+        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
-                        + "ON users.id=user_roles.user_id "
-                        + "INNER JOIN %s "
-                        + "ON user_roles.role_id = roles.id WHERE users.id=?",
+                        + "ON users.user_id=user_roles.user_id "
+                        + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.user_id=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
-            User user = null;
-            while (rs.next()) {
-                user = new User(rs.getString("name"), rs.getString("password"));
-                user.setToken(rs.getString("token"));
-                user.setUserId(rs.getLong("userId"));
-                Role role = new Role(Role.RoleName.valueOf(rs.getString("role")));
-                role.setId(rs.getLong("idRole"));
-                user.setRole(role);
-            }
+            User user = getUserFromResultSet(rs);
             return Optional.of(user);
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get user by id", e);
@@ -186,48 +175,22 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             throw new DataProcessingException("Can't delete users role due update", e);
         }
 
-        newUser.setRoles(setUserRoles(newUser));
+        newUser.setRoles(getUserRoles(newUser));
         return newUser;
     }
 
     @Override
     public boolean deleteById(Long userId) throws DataProcessingException {
-        String query = String.format("SELECT order_id FROM %s WHERE user_id=?",
-                ORDERS_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
-            List<Long> listUserOrdersId = new ArrayList<>();
-            while (rs.next()) {
-                listUserOrdersId.add(rs.getLong(1));
-            }
-            for (Long orderId : listUserOrdersId) {
-                orderDao.deleteById(orderId);
-            }
-        } catch (SQLException e) {
-            throw new DataProcessingException(
-                    "Can't delete user orders by userId due delete user", e);
-        }
+        deleteFromTableByUserId(userId, ORDERS_TABLE);
+        deleteFromTableByUserId(userId, BUCKETS_TABLE);
+        deleteFromTableByUserId(userId, USER_ROLES_TABLE);
+        deleteFromTableByUserId(userId, USER_TABLE);
+        return true;
+    }
 
-        query = String.format("SELECT bucket_id FROM %s WHERE user_id=?",
-                BUCKETS_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
-            List<Long> listUserBucketsId = new ArrayList<>();
-            while (rs.next()) {
-                listUserBucketsId.add(rs.getLong(1));
-            }
-            for (Long bucketId : listUserBucketsId) {
-                bucketDao.deleteById(bucketId);
-            }
-        } catch (SQLException e) {
-            throw new DataProcessingException(
-                    "Can't delete user bucket by userId due delete user", e);
-        }
-
-        query = String.format("DELETE FROM %s WHERE user_id=?",
-                USER_ROLES_TABLE);
+    private void deleteFromTableByUserId(Long userId, String table) throws DataProcessingException {
+        String query = String.format("DELETE FROM %s WHERE user_id=?",
+                table);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, userId);
             ps.executeUpdate();
@@ -235,22 +198,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             throw new DataProcessingException(
                     "Can't delete user role by userId due delete user", e);
         }
-
-        query = String.format("DELETE FROM %s WHERE id=?",
-                USER_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, userId);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete user", e);
-        }
     }
 
     @Override
     public boolean delete(User entity) throws DataProcessingException {
-        deleteById(entity.getUserId());
-        return true;
+        return deleteById(entity.getUserId());
     }
 
     @Override
@@ -261,11 +213,12 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
+                Long id = resultSet.getLong("user_id");
                 String name = resultSet.getString("name");
                 String password = resultSet.getString("password");
                 User user = new User(name, password);
                 user.setUserId(id);
+                user.setRoles(getUserRoles(user));
                 list.add(user);
             }
         } catch (SQLException e) {
