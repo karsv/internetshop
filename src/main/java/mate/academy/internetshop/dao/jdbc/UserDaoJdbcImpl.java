@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.dao.OrderDao;
@@ -47,15 +48,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, login);
             ResultSet rs = stmt.executeQuery();
-            User user = null;
-            while (rs.next()) {
-                user = new User(rs.getString("name"), rs.getString("password"));
-                user.setToken(rs.getString("token"));
-                user.setUserId(rs.getLong("userId"));
-                Role role = new Role(Role.RoleName.valueOf(rs.getString("role")));
-                role.setId(rs.getLong("idRole"));
-                user.setRole(role);
-            }
+            User user = getUserFromResultSet(rs);
             return Optional.of(user);
         } catch (SQLException e) {
             throw new DataProcessingException("Can't login user", e);
@@ -73,19 +66,24 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, token);
             ResultSet rs = stmt.executeQuery();
-            User user = null;
-            while (rs.next()) {
-                user = new User(rs.getString("name"), rs.getString("password"));
-                user.setToken(rs.getString("token"));
-                user.setUserId(rs.getLong("userId"));
-                Role role = new Role(Role.RoleName.valueOf(rs.getString("role")));
-                role.setId(rs.getLong("idRole"));
-                user.setRole(role);
-            }
+            User user = getUserFromResultSet(rs);
             return Optional.of(user);
         } catch (SQLException e) {
             throw new DataProcessingException("Can't find user by token", e);
         }
+    }
+
+    private User getUserFromResultSet(ResultSet rs) throws SQLException {
+        User user = null;
+        while (rs.next()) {
+            user = new User(rs.getString("name"), rs.getString("password"));
+            user.setToken(rs.getString("token"));
+            user.setUserId(rs.getLong("userId"));
+            Role role = new Role(Role.RoleName.valueOf(rs.getString("role")));
+            role.setId(rs.getLong("idRole"));
+            user.setRole(role);
+        }
+        return user;
     }
 
     @Override
@@ -107,32 +105,36 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             throw new DataProcessingException("Can't create new user", e);
         }
 
-        Long roleId = null;
-        for (Role role : user.getRoles()) {
-            query = String.format("SELECT id FROM %s WHERE role_name=?",
+        user.setRoles(setUserRoles(user));
+        return user;
+    }
+
+    private Set<Role> setUserRoles(User user) throws DataProcessingException {
+        Set<Role> roles = user.getRoles();
+        for (Role role : roles) {
+            String query = String.format("SELECT id FROM %s WHERE role_name=?",
                     ROLES_TABLE);
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setString(1, role.getRoleName().toString());
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    roleId = rs.getLong("id");
-                    role.setId(roleId);
+                    role.setId(rs.getLong("id"));
                 }
             } catch (SQLException e) {
                 throw new DataProcessingException("Can't get roles id", e);
             }
 
             query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
-                    USER_ROLES_TABLE, user.getUserId(), roleId);
+                    USER_ROLES_TABLE, user.getUserId(), role.getId());
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setLong(1, user.getUserId());
-                stmt.setLong(2, roleId);
+                stmt.setLong(2, role.getId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 throw new DataProcessingException("Can't insert roles for new user", e);
             }
         }
-        return user;
+        return roles;
     }
 
     @Override
@@ -184,30 +186,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
             throw new DataProcessingException("Can't delete users role due update", e);
         }
 
-        Long roleId = 1L;
-        for (Role role : user.getRoles()) {
-            query = String.format("SELECT id FROM %s WHERE role_name=?",
-                    ROLES_TABLE, role.getRoleName().toString());
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, role.getRoleName().toString());
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    roleId = rs.getLong("id");
-                }
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't get role id", e);
-            }
-
-            query = String.format("INSERT INTO %s(user_id, role_id) VALUES(?, ?)",
-                    USER_ROLES_TABLE);
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setLong(1, newUser.getUserId());
-                stmt.setLong(2, roleId);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't update user roles", e);
-            }
-        }
+        newUser.setRoles(setUserRoles(newUser));
         return newUser;
     }
 

@@ -24,7 +24,9 @@ public class DeleteItemController extends HttpServlet {
         try {
             itemService.deleteById(Long.valueOf(req.getParameter("item_id")));
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't delete item by Id", e);
+            LOGGER.error("Can't delete item by Id", e);
+            req.setAttribute("errorMsg", "Error due delete item!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/items");
     }

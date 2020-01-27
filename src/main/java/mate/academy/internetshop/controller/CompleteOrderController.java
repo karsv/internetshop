@@ -38,17 +38,17 @@ public class CompleteOrderController extends HttpServlet {
         try {
             Long userId = (Long) req.getSession().getAttribute("userId");
             Bucket bucket = bucketService.getByUserId(userId);
-            User user = null;
-            user = userService.get(userId).get();
+            User user = userService.get(userId).get();
             Order order = orderService.completeOrder(bucket.getItems(), user);
             bucketService.clear(bucket);
-            List<Item> itemList = null;
-            itemList = orderService.get(order.getOrderId()).get().getItems();
+            List<Item> itemList = orderService.get(order.getOrderId()).get().getItems();
             req.setAttribute("items", itemList);
             req.setAttribute("amount", order.getAmount());
             req.setAttribute("order_id", order.getOrderId());
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't complete order", e);
+            LOGGER.error("Can't complete order", e);
+            req.setAttribute("errorMsg", "Error due complete order!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
 
         req.getRequestDispatcher("/WEB-INF/views/order.jsp").forward(req, resp);

@@ -35,7 +35,9 @@ public class AddItemController extends HttpServlet {
             Item item = new Item(name, cost);
             itemService.create(item);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't add item", e);
+            LOGGER.error("Can't add item", e);
+            req.setAttribute("errorMsg", "Error due add item!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/items");
     }

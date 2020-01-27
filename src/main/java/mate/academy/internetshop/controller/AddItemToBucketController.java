@@ -36,7 +36,9 @@ public class AddItemToBucketController extends HttpServlet {
             Item item = itemService.get(Long.valueOf(itemId)).get();
             bucketService.addItem(bucket, item);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't add item to bucket", e);
+            LOGGER.error("Can't add item to bucket", e);
+            req.setAttribute("errorMsg", "Error due add item to bucket!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
 
         resp.sendRedirect(req.getContextPath() + "/servlet/items");

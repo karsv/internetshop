@@ -46,6 +46,11 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
             throw new DataProcessingException("Can't create bucket", e);
         }
 
+        insertIntoBucketItemTable(bucket);
+        return bucket;
+    }
+
+    private void insertIntoBucketItemTable(Bucket bucket) throws DataProcessingException {
         for (Item item : bucket.getItems()) {
             String queryItems = String.format("INSERT INTO %s(bucket_id, item_id) VALUE(?, ?)",
                     BUCKET_ITEMS_TABLE);
@@ -57,65 +62,42 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
                 throw new DataProcessingException("Can't add item_id/bucket_id to bucket_item", e);
             }
         }
-        return bucket;
     }
 
     @Override
     public Optional<Bucket> get(Long bucketId) throws DataProcessingException {
-        String query = String.format("SELECT bucket.bucket_id, bucket.user_id, "
-                        + "items.item_id, items.name, items.price FROM %s "
-                        + "LEFT JOIN %s ON bucket.bucket_id = bucket_item.bucket_id "
-                        + "LEFT JOIN %s ON bucket_item.item_id = items.item_id "
-                        + "WHERE bucket.bucket_id=?;", BUCKET_TABLE, BUCKET_ITEMS_TABLE,
-                ITEMS_TABLE);
+        String query = String.format("SELECT bucket_id, user_id FROM %s WHERE bucket_id=?;",
+                BUCKET_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, bucketId);
             ResultSet resultSet = ps.executeQuery();
             Bucket bucket = null;
-            List<Item> bucketItems = new ArrayList<>();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 bucket = new Bucket(resultSet.getLong(2));
                 bucket.setBucketId(resultSet.getLong(1));
-                if (resultSet.getString(4) == null) {
-                    continue;
-                }
-                Item item = new Item(resultSet.getString(4),
-                        resultSet.getBigDecimal(5));
-                item.setItemId(resultSet.getLong(3));
-                bucketItems.add(item);
+                bucket.setItems(getAllItemFromBucket(bucket.getBucketId()));
+                return Optional.of(bucket);
             }
-            bucket.setItems(bucketItems);
-            return Optional.of(bucket);
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get bucket by ID", e);
         }
+        return Optional.empty();
     }
 
     @Override
-    public Bucket update(Bucket entity) throws DataProcessingException {
+    public Bucket update(Bucket bucket) throws DataProcessingException {
         String query = String.format("DELETE FROM %s WHERE bucket_id=?",
                 BUCKET_ITEMS_TABLE);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, entity.getBucketId());
+            preparedStatement.setLong(1, bucket.getBucketId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new DataProcessingException("Can't update bucket, "
                     + "due delete items by bucket_id in bucket_items", e);
         }
 
-        query = String.format("INSERT INTO %s(bucket_id, item_id) VALUE(?, ?)",
-                BUCKET_ITEMS_TABLE);
-        for (Item item : entity.getItems()) {
-            try (PreparedStatement ps = connection.prepareStatement(query)) {
-                ps.setLong(1, entity.getBucketId());
-                ps.setLong(2, item.getItemId());
-                int rows = ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't insert new entities "
-                        + "to bucket_item table", e);
-            }
-        }
-        return entity;
+        insertIntoBucketItemTable(bucket);
+        return bucket;
     }
 
     @Override
@@ -166,17 +148,13 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
             throw new DataProcessingException("Can't get all buckets", e);
         }
 
-        List<Bucket> buckets = new ArrayList<>();
-        for (Bucket bucket : tempBuckets) {
-            buckets.add(get(bucket.getBucketId()).get());
-        }
-        return buckets;
+        return tempBuckets;
     }
 
     private List<Item> getAllItemFromBucket(Long bucketId) throws DataProcessingException {
         List<Item> listOfItems = new ArrayList<>();
         String query = String.format("SELECT items.item_id, name, price FROM %s items JOIN %s bit"
-                + " ON items.item_id = bit.item_id AND bucket_id = ?",
+                        + " ON items.item_id = bit.item_id AND bucket_id = ?",
                 ITEMS_TABLE, BUCKET_ITEMS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, bucketId);

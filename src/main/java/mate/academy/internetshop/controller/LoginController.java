@@ -45,7 +45,9 @@ public class LoginController extends HttpServlet {
             req.setAttribute("errorMsg", "Wrong parameters!");
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't login user", e);
+            LOGGER.error("Can't login user", e);
+            req.setAttribute("errorMsg", "Error due login!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
     }
 }

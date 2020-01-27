@@ -36,7 +36,9 @@ public class GetAllUserOrdersController extends HttpServlet {
             List<Order> orderList = orderService.getUserOrders(user);
             req.setAttribute("orders", orderList);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't get all users orders", e);
+            LOGGER.error("Can't get all users orders", e);
+            req.setAttribute("errorMsg", "Error due get all user orders!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
         req.getRequestDispatcher("/WEB-INF/views/userOrders.jsp").forward(req, resp);
     }

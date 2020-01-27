@@ -27,7 +27,9 @@ public class GetAllItemsController extends HttpServlet {
         try {
             list = itemService.getAll();
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't get all items", e);
+            LOGGER.error("Can't get all items", e);
+            req.setAttribute("errorMsg", "Error due get all items!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
         req.setAttribute("items", list);
         req.getRequestDispatcher("/WEB-INF/views/items.jsp").forward(req, resp);

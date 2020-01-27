@@ -30,7 +30,9 @@ public class GetAllItemsFromBucketController extends HttpServlet {
             bucketService.update(bucket);
             req.setAttribute("bucket", bucket);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't get all items from bucket", e);
+            LOGGER.error("Can't get all items from bucket", e);
+            req.setAttribute("errorMsg", "Error due get all items from bucket!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
 
         req.getRequestDispatcher("/WEB-INF/views/bucket.jsp").forward(req, resp);

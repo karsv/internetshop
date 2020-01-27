@@ -46,49 +46,30 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             throw new DataProcessingException("Can't create order", e);
         }
 
-        for (Item item : newOrder.getItems()) {
-            query = String.format("INSERT INTO %s (order_id, item_id) VALUES(?, ?)",
-                    ORDER_ITEMS_TABLE);
-            try (PreparedStatement ps = connection.prepareStatement(query)) {
-                ps.setLong(1, newOrder.getOrderId());
-                ps.setLong(2, item.getItemId());
-                int rows = ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't add items by order_id to order_items", e);
-            }
-        }
+        insertIntoOrderItemTable(order);
 
         return newOrder;
     }
 
     @Override
     public Optional<Order> get(Long orderId) throws DataProcessingException {
-        String query = String.format("SELECT orders.order_id, orders.user_id, orders.amount, "
-                + "items.item_id, items.name, items.price "
-                + "FROM %s LEFT JOIN %s ON orders.order_id = order_items.order_id "
-                + "LEFT JOIN %s ON order_items.item_id = items.item_id "
-                + "WHERE orders.order_id=(?);", ORDER_TABLE, ORDER_ITEMS_TABLE, ITEMS_TABLE);
+        String query = String.format("SELECT order_id, user_id, amount "
+                + "FROM %s WHERE order_id=(?);", ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, orderId);
             ResultSet resultSet = ps.executeQuery();
-            Order order = new Order();
-            List<Item> itemList = new ArrayList<>();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
+                Order order = new Order();
                 order.setOrderId(resultSet.getLong(1));
                 order.setUserId(resultSet.getLong(2));
                 order.setAmount(resultSet.getBigDecimal(3));
-                Long itemId = resultSet.getLong(4);
-                String itemName = resultSet.getString(5);
-                BigDecimal itemPrice = resultSet.getBigDecimal(6);
-                Item item = new Item(itemName, itemPrice);
-                item.setItemId(itemId);
-                itemList.add(item);
+                order.setItems(getAllItemFromOrder(orderId));
+                return Optional.of(order);
             }
-            order.setItems(itemList);
-            return Optional.of(order);
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get order by id", e);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -103,18 +84,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                     "Can't delete orders items due update from order_items", e);
         }
 
-        query = String.format("INSERT INTO %s(order_id, item_id) VALUE(?, ?)",
-                ORDER_ITEMS_TABLE);
-        for (Item item : order.getItems()) {
-            try (PreparedStatement ps = connection.prepareStatement(query)) {
-                ps.setLong(1, order.getOrderId());
-                ps.setLong(2, item.getItemId());
-                int rows = ps.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException(
-                        "Can't insert new items to order_items due update", e);
-            }
-        }
+        insertIntoOrderItemTable(order);
 
         query = String.format("UPDATE %s SET amount=(?) WHERE order_id=?",
                 ORDER_TABLE);
@@ -126,6 +96,21 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             throw new DataProcessingException("Can't update order", e);
         }
         return order;
+    }
+
+    private void insertIntoOrderItemTable(Order order) throws DataProcessingException {
+        String query = String.format("INSERT INTO %s(order_id, item_id) VALUE(?, ?)",
+                ORDER_ITEMS_TABLE);
+        for (Item item : order.getItems()) {
+            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setLong(1, order.getOrderId());
+                ps.setLong(2, item.getItemId());
+                int rows = ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new DataProcessingException(
+                        "Can't insert new items to order_items", e);
+            }
+        }
     }
 
     @Override

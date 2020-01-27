@@ -36,7 +36,9 @@ public class RegistrationController extends HttpServlet {
         try {
             userService.create(newUser);
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't registrate user", e);
+            LOGGER.error("Can't registrate user", e);
+            req.setAttribute("errorMsg", "Error due registration!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
         }
 
         resp.sendRedirect(req.getContextPath() + "/index");

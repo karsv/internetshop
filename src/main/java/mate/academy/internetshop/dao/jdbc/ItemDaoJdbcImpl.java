@@ -105,8 +105,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
 
     @Override
     public boolean delete(Item entity) throws DataProcessingException {
-        deleteById(entity.getItemId());
-        return false;
+        return deleteById(entity.getItemId());
     }
 
     @Override
