@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.service.ItemService;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +23,7 @@ public class DeleteItemController extends HttpServlet {
             throws ServletException, IOException {
         try {
             itemService.deleteById(Long.valueOf(req.getParameter("item_id")));
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't delete item by Id", e);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/items");

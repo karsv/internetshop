@@ -13,7 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
@@ -51,7 +51,7 @@ public class AuthentificationFilter implements Filter {
                         filterChain.doFilter(servletRequest, servletResponse);
                         return;
                     }
-                } catch (JdbcDaoException e) {
+                } catch (DataProcessingException e) {
                     LOGGER.warn("Can't authentificate user", e);
                 }
             }

@@ -16,7 +16,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
@@ -64,7 +64,7 @@ public class AuthorizationFilter implements Filter {
         User user = null;
         try {
             user = userService.get(userId).get();
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't authorizate user", e);
         }
         if (verifyRole(user, roleName)) {

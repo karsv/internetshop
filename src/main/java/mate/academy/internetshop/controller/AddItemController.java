@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Item;
 import mate.academy.internetshop.service.ItemService;
@@ -34,7 +34,7 @@ public class AddItemController extends HttpServlet {
             BigDecimal cost = new BigDecimal(req.getParameter("cost"));
             Item item = new Item(name, cost);
             itemService.create(item);
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't add item", e);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/items");

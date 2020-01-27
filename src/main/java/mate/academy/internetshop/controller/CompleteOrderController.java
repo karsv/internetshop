@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Item;
@@ -47,7 +47,7 @@ public class CompleteOrderController extends HttpServlet {
             req.setAttribute("items", itemList);
             req.setAttribute("amount", order.getAmount());
             req.setAttribute("order_id", order.getOrderId());
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't complete order", e);
         }
 

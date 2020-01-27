@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Order;
 import mate.academy.internetshop.model.User;
@@ -35,7 +35,7 @@ public class GetAllUserOrdersController extends HttpServlet {
             user = userService.get(userId).get();
             List<Order> orderList = orderService.getUserOrders(user);
             req.setAttribute("orders", orderList);
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't get all users orders", e);
         }
         req.getRequestDispatcher("/WEB-INF/views/userOrders.jsp").forward(req, resp);

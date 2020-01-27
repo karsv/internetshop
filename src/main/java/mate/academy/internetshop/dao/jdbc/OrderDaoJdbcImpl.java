@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.OrderDao;
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Item;
 import mate.academy.internetshop.model.Order;
@@ -27,7 +27,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
     }
 
     @Override
-    public Order create(Order order) throws JdbcDaoException {
+    public Order create(Order order) throws DataProcessingException {
         Order newOrder = order;
         String query = String.format("INSERT INTO %s (user_id, amount) VALUES(?, ?)", ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query,
@@ -43,7 +43,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 }
             }
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't create order");
+            throw new DataProcessingException("Can't create order", e);
         }
 
         for (Item item : newOrder.getItems()) {
@@ -54,7 +54,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 ps.setLong(2, item.getItemId());
                 int rows = ps.executeUpdate();
             } catch (SQLException e) {
-                throw new JdbcDaoException("Can't add items by order_id to order_items");
+                throw new DataProcessingException("Can't add items by order_id to order_items", e);
             }
         }
 
@@ -62,7 +62,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
     }
 
     @Override
-    public Optional<Order> get(Long orderId) throws JdbcDaoException {
+    public Optional<Order> get(Long orderId) throws DataProcessingException {
         String query = String.format("SELECT orders.order_id, orders.user_id, orders.amount, "
                 + "items.item_id, items.name, items.price "
                 + "FROM %s LEFT JOIN %s ON orders.order_id = order_items.order_id "
@@ -87,19 +87,20 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             order.setItems(itemList);
             return Optional.of(order);
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't get order by id");
+            throw new DataProcessingException("Can't get order by id", e);
         }
     }
 
     @Override
-    public Order update(Order order) throws JdbcDaoException {
+    public Order update(Order order) throws DataProcessingException {
         String query = String.format("DELETE FROM %s WHERE order_id=?",
                 ORDER_ITEMS_TABLE);
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, order.getOrderId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't delete orders items due update from order_items");
+            throw new DataProcessingException(
+                    "Can't delete orders items due update from order_items", e);
         }
 
         query = String.format("INSERT INTO %s(order_id, item_id) VALUE(?, ?)",
@@ -110,7 +111,8 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 ps.setLong(2, item.getItemId());
                 int rows = ps.executeUpdate();
             } catch (SQLException e) {
-                throw new JdbcDaoException("Can't insert new items to order_items due update");
+                throw new DataProcessingException(
+                        "Can't insert new items to order_items due update", e);
             }
         }
 
@@ -121,21 +123,21 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             ps.setLong(2, order.getOrderId());
             int rows = ps.executeUpdate();
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't update order");
+            throw new DataProcessingException("Can't update order", e);
         }
         return order;
     }
 
     @Override
-    public boolean deleteById(Long orderId) throws JdbcDaoException {
+    public boolean deleteById(Long orderId) throws DataProcessingException {
         String query = String.format("DELETE FROM %s WHERE order_id =?",
                 ORDER_ITEMS_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, orderId);
             int rows = ps.executeUpdate();
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't delete orders items due delete "
-                    + "Order from order_items");
+            throw new DataProcessingException("Can't delete orders items due delete "
+                    + "Order from order_items", e);
         }
 
         query = String.format("DELETE FROM %s WHERE order_id =?",
@@ -145,17 +147,17 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             int rows = ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't delete order");
+            throw new DataProcessingException("Can't delete order", e);
         }
     }
 
     @Override
-    public boolean delete(Order order) throws JdbcDaoException {
+    public boolean delete(Order order) throws DataProcessingException {
         return deleteById(order.getOrderId());
     }
 
     @Override
-    public List<Order> getAll() throws JdbcDaoException {
+    public List<Order> getAll() throws DataProcessingException {
         List<Order> tempOrders = new ArrayList<>();
         String query = String.format("SELECT order_id, user_id, amount FROM %s",
                 ORDER_TABLE);
@@ -173,7 +175,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 tempOrders.add(order);
             }
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't get all orders");
+            throw new DataProcessingException("Can't get all orders", e);
         }
 
         List<Order> orders = new ArrayList<>();

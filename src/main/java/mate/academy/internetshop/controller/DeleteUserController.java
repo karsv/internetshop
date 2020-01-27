@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.service.UserService;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +23,7 @@ public class DeleteUserController extends HttpServlet {
             throws ServletException, IOException {
         try {
             userService.deleteById(Long.valueOf(req.getParameter("user_id")));
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't delete user", e);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/allUsers");

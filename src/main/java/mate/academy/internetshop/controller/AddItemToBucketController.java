@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Item;
@@ -35,7 +35,7 @@ public class AddItemToBucketController extends HttpServlet {
             String itemId = req.getParameter("item_id");
             Item item = itemService.get(Long.valueOf(itemId)).get();
             bucketService.addItem(bucket, item);
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't add item to bucket", e);
         }
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.exceptions.AuthentificationException;
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.lib.Service;
 import mate.academy.internetshop.model.User;
@@ -23,40 +23,40 @@ public class UserServiceImpl implements UserService {
     private static BucketService bucketService;
 
     @Override
-    public User create(User user) throws JdbcDaoException {
+    public User create(User user) throws DataProcessingException {
         user.setToken(getToken());
         return userDao.create(user);
     }
 
     @Override
-    public Optional<User> get(Long userId) throws JdbcDaoException {
+    public Optional<User> get(Long userId) throws DataProcessingException {
         return userDao.get(userId);
     }
 
     @Override
-    public User update(User user) throws JdbcDaoException {
+    public User update(User user) throws DataProcessingException {
         userDao.update(user);
         return user;
     }
 
     @Override
-    public List<User> getAll() throws JdbcDaoException {
+    public List<User> getAll() throws DataProcessingException {
         return userDao.getAll();
     }
 
     @Override
-    public boolean deleteById(Long userId) throws JdbcDaoException {
+    public boolean deleteById(Long userId) throws DataProcessingException {
         return userDao.deleteById(userId);
     }
 
     @Override
-    public boolean delete(User user) throws JdbcDaoException {
+    public boolean delete(User user) throws DataProcessingException {
         return userDao.delete(user);
     }
 
     @Override
     public User login(String login, String password) throws AuthentificationException,
-            JdbcDaoException {
+            DataProcessingException {
         Optional<User> user = userDao.login(login);
         if (user.isEmpty() || !user.get().getPassword().equals(password)) {
             throw new AuthentificationException("Wrong authentification parameters!");
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByToken(String token) throws JdbcDaoException {
+    public Optional<User> findByToken(String token) throws DataProcessingException {
         return userDao.findByToken(token);
     }
 }

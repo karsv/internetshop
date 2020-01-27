@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.ItemDao;
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Item;
 
@@ -24,7 +24,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public Item create(Item entity) throws JdbcDaoException {
+    public Item create(Item entity) throws DataProcessingException {
         String query = String.format("INSERT INTO %s(name, price) VALUES(?, ?)",
                 ITEMS_TABLE, entity.getName(), entity.getPrice());
 
@@ -33,13 +33,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
             stmt.setBigDecimal(2, entity.getPrice());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't create item");
+            throw new DataProcessingException("Can't create item", e);
         }
         return entity;
     }
 
     @Override
-    public Optional<Item> get(Long itemId) throws JdbcDaoException {
+    public Optional<Item> get(Long itemId) throws DataProcessingException {
         String query = String.format("SELECT * FROM %s WHERE item_id=?", ITEMS_TABLE);
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -52,13 +52,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 return Optional.of(item);
             }
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't item bu id");
+            throw new DataProcessingException("Can't item bu id", e);
         }
         return Optional.empty();
     }
 
     @Override
-    public Item update(Item entity) throws JdbcDaoException {
+    public Item update(Item entity) throws DataProcessingException {
         String query = "UPDATE items SET name=?, price=? WHERE item_id=?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, entity.getName());
@@ -66,13 +66,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
             stmt.setLong(3, entity.getItemId());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't update item");
+            throw new DataProcessingException("Can't update item", e);
         }
         return entity;
     }
 
     @Override
-    public boolean deleteById(Long longId) throws JdbcDaoException {
+    public boolean deleteById(Long longId) throws DataProcessingException {
         Optional<Item> item = get(longId);
         if (item.isPresent()) {
             String query = String.format("DELETE FROM %s WHERE item_id=?", BUCKET_ITEM_TABLE);
@@ -80,7 +80,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 stmt.setLong(1, longId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                throw new JdbcDaoException("Can't delete item by id in bucket_item");
+                throw new DataProcessingException("Can't delete item by id in bucket_item", e);
             }
 
             query = String.format("DELETE FROM %s WHERE item_id=?", ORDER_ITEM_TABLE);
@@ -88,7 +88,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 stmt.setLong(1, longId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                throw new JdbcDaoException("Can't delete item by id in order_item");
+                throw new DataProcessingException("Can't delete item by id in order_item", e);
             }
 
             query = String.format("DELETE FROM %s WHERE item_id=?", ITEMS_TABLE);
@@ -96,7 +96,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 stmt.setLong(1, longId);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                throw new JdbcDaoException("Can't delete item by id");
+                throw new DataProcessingException("Can't delete item by id", e);
             }
             return true;
         }
@@ -104,13 +104,13 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public boolean delete(Item entity) throws JdbcDaoException {
+    public boolean delete(Item entity) throws DataProcessingException {
         deleteById(entity.getItemId());
         return false;
     }
 
     @Override
-    public List<Item> getAll() throws JdbcDaoException {
+    public List<Item> getAll() throws DataProcessingException {
         List<Item> list = new ArrayList<>();
         String query = String.format("SELECT * FROM %s", ITEMS_TABLE);
 
@@ -123,7 +123,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
                 list.add(item);
             }
         } catch (SQLException e) {
-            throw new JdbcDaoException("Can't get all items");
+            throw new DataProcessingException("Can't get all items", e);
         }
         return list;
     }

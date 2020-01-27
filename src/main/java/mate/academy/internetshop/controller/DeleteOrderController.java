@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import mate.academy.internetshop.exceptions.JdbcDaoException;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.service.OrderService;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +23,7 @@ public class DeleteOrderController extends HttpServlet {
             throws ServletException, IOException {
         try {
             orderService.deleteById(Long.valueOf(req.getParameter("order_id")));
-        } catch (JdbcDaoException e) {
+        } catch (DataProcessingException e) {
             LOGGER.warn("Can't delete order", e);
         }
         resp.sendRedirect(req.getContextPath() + "/servlet/userOrders");
