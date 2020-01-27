@@ -172,6 +172,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 order.setOrderId(orderId);
                 order.setUserId(userId);
                 order.setAmount(amount);
+                order.setItems(getAllItemFromOrder(orderId));
                 tempOrders.add(order);
             }
         } catch (SQLException e) {
@@ -183,5 +184,27 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             orders.add(get(order.getOrderId()).get());
         }
         return orders;
+    }
+
+    private List<Item> getAllItemFromOrder(Long orderId) throws DataProcessingException {
+        List<Item> listOfItems = new ArrayList<>();
+        String query = String.format("SELECT items.item_id, name, price FROM %s items JOIN %s oit"
+                        + " ON items.item_id = oit.item_id AND order_id = ?",
+                ITEMS_TABLE, ORDER_ITEMS_TABLE);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Long itemId = rs.getLong(1);
+                String itemName = rs.getString(2);
+                BigDecimal itemPrice = rs.getBigDecimal(3);
+                Item item = new Item(itemName, itemPrice);
+                item.setItemId(itemId);
+                listOfItems.add(item);
+            }
+        } catch (SQLException e) {
+            throw new DataProcessingException("Can't get all items from order", e);
+        }
+        return listOfItems;
     }
 }

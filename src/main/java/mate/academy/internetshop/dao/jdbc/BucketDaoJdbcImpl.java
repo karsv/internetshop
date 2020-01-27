@@ -1,5 +1,6 @@
 package mate.academy.internetshop.dao.jdbc;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -158,6 +159,7 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
                 Long userId = resultSet.getLong(2);
                 Bucket bucket = new Bucket(userId);
                 bucket.setBucketId(bucketId);
+                bucket.setItems(getAllItemFromBucket(bucketId));
                 tempBuckets.add(bucket);
             }
         } catch (SQLException e) {
@@ -169,6 +171,28 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
             buckets.add(get(bucket.getBucketId()).get());
         }
         return buckets;
+    }
+
+    private List<Item> getAllItemFromBucket(Long bucketId) throws DataProcessingException {
+        List<Item> listOfItems = new ArrayList<>();
+        String query = String.format("SELECT items.item_id, name, price FROM %s items JOIN %s bit"
+                + " ON items.item_id = bit.item_id AND bucket_id = ?",
+                ITEMS_TABLE, BUCKET_ITEMS_TABLE);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, bucketId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Long itemId = rs.getLong(1);
+                String itemName = rs.getString(2);
+                BigDecimal itemPrice = rs.getBigDecimal(3);
+                Item item = new Item(itemName, itemPrice);
+                item.setItemId(itemId);
+                listOfItems.add(item);
+            }
+        } catch (SQLException e) {
+            throw new DataProcessingException("Can't get all items from bucket", e);
+        }
+        return listOfItems;
     }
 
     @Override
