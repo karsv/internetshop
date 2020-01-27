@@ -6,12 +6,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RegistrationController extends HttpServlet {
+    private static final Logger LOGGER = LogManager.getLogger(RegistrationController.class);
+
     @Inject
     private static UserService userService;
 
@@ -28,7 +33,13 @@ public class RegistrationController extends HttpServlet {
         String password = req.getParameter("password");
         User newUser = new User(login, password);
         newUser.setRole(Role.of("USER"));
-        userService.create(newUser);
+        try {
+            userService.create(newUser);
+        } catch (DataProcessingException e) {
+            LOGGER.error("Can't registrate user", e);
+            req.setAttribute("errorMsg", "Error due registration!");
+            req.getRequestDispatcher("/WEB-INF/views/processExc.jsp").forward(req, resp);
+        }
 
         resp.sendRedirect(req.getContextPath() + "/index");
     }

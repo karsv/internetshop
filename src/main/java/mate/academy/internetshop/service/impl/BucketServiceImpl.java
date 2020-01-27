@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.dao.ItemDao;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.lib.Service;
 import mate.academy.internetshop.model.Bucket;
@@ -21,45 +22,44 @@ public class BucketServiceImpl implements BucketService {
     private static ItemDao itemDao;
 
     @Override
-    public Bucket create(Bucket bucket) {
+    public Bucket create(Bucket bucket) throws DataProcessingException {
         return bucketDao.create(bucket);
     }
 
     @Override
-    public Optional<Bucket> get(Long bucketId) {
+    public Optional<Bucket> get(Long bucketId) throws DataProcessingException {
         Optional<Bucket> bucket = bucketDao.get(bucketId);
         return bucket;
     }
 
     @Override
-    public Bucket update(Bucket bucket) {
+    public Bucket update(Bucket bucket) throws DataProcessingException {
         return bucketDao.update(bucket);
     }
 
     @Override
-    public List<Bucket> getAll() {
+    public List<Bucket> getAll() throws DataProcessingException {
         return bucketDao.getAll();
     }
 
     @Override
-    public boolean deleteById(Long bucketId) {
+    public boolean deleteById(Long bucketId) throws DataProcessingException {
         return bucketDao.deleteById(bucketId);
     }
 
     @Override
-    public boolean delete(Bucket bucket) {
+    public boolean delete(Bucket bucket) throws DataProcessingException {
         return bucketDao.delete(bucket);
     }
 
     @Override
-    public void addItem(Bucket bucket, Item item) {
-        Bucket newBucket = bucketDao.get(bucket.getBucketId()).get();
-        newBucket.getItems().add(item);
-        bucketDao.update(newBucket);
+    public void addItem(Bucket bucket, Item item) throws DataProcessingException {
+        bucket.getItems().add(item);
+        bucketDao.update(bucket);
     }
 
     @Override
-    public void deleteItem(Bucket bucket, Item item) {
+    public void deleteItem(Bucket bucket, Item item) throws DataProcessingException {
         Bucket newBucket = bucketDao.get(bucket.getBucketId()).get();
         List<Item> itemOfBucket = newBucket.getItems();
         itemOfBucket.remove(item);
@@ -67,22 +67,26 @@ public class BucketServiceImpl implements BucketService {
     }
 
     @Override
-    public void clear(Bucket bucket) {
+    public void clear(Bucket bucket) throws DataProcessingException {
         Bucket tempBucket = bucketDao.get(bucket.getBucketId()).get();
         tempBucket.getItems().clear();
         bucketDao.update(tempBucket);
     }
 
     @Override
-    public Bucket getByUserId(Long userId) {
-        return bucketDao.getAll().stream()
+    public Bucket getByUserId(Long userId) throws DataProcessingException {
+        List<Bucket> list = bucketDao.getAll();
+        Optional<Bucket> bucket = bucketDao.getAll().stream()
                 .filter(x -> x.getUserId().equals(userId))
-                .findFirst()
-                .orElse(create(new Bucket(userId)));
+                .findFirst();
+        if (bucket.isPresent()) {
+            return bucket.get();
+        }
+        return create(new Bucket(userId));
     }
 
     @Override
-    public List<Item> getAllItems(Bucket bucket) {
+    public List<Item> getAllItems(Bucket bucket) throws DataProcessingException {
         return bucketDao.get(bucket.getBucketId()).get().getItems();
     }
 }

@@ -16,12 +16,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthorizationFilter implements Filter {
+    private static final Logger LOGGER = LogManager.getLogger(AuthorizationFilter.class);
     private Map<String, Role.RoleName> protectedUrls = new HashMap<>();
     private static final String COOKIE = "MATE";
 
@@ -57,7 +61,12 @@ public class AuthorizationFilter implements Filter {
         }
 
         Long userId = (Long) req.getSession().getAttribute("userId");
-        User user = userService.get(userId).get();
+        User user = null;
+        try {
+            user = userService.get(userId).get();
+        } catch (DataProcessingException e) {
+            LOGGER.warn("Can't authorizate user", e);
+        }
         if (verifyRole(user, roleName)) {
             filterChain.doFilter(req, resp);
             return;

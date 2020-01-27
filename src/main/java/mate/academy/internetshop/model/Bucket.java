@@ -9,8 +9,8 @@ public class Bucket {
     private List<Item> items;
 
     public Bucket(Long userId) {
-        items = new ArrayList<>();
         this.userId = userId;
+        items = new ArrayList<>();
     }
 
     public Long getUserId() {
@@ -29,6 +29,10 @@ public class Bucket {
         return bucketId;
     }
 
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
     public List<Item> getItems() {
         return items;
     }
@@ -38,7 +42,7 @@ public class Bucket {
         return "Bucket{"
                 + "bucketId="
                 + bucketId
-                + "userId="
+                + ", userId="
                 + userId
                 + ", items="
                 + items

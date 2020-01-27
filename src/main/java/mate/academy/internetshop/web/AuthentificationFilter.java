@@ -13,11 +13,15 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthentificationFilter implements Filter {
+    private static final Logger LOGGER = LogManager.getLogger(AuthorizationFilter.class);
     private static final String COOKIE = "MATE";
 
     @Inject
@@ -40,10 +44,15 @@ public class AuthentificationFilter implements Filter {
 
         for (Cookie cookie : req.getCookies()) {
             if (cookie.getName().equals(COOKIE)) {
-                Optional<User> user = userService.findByToken(cookie.getValue());
-                if (user.isPresent()) {
-                    filterChain.doFilter(servletRequest, servletResponse);
-                    return;
+                Optional<User> user = null;
+                try {
+                    user = userService.findByToken(cookie.getValue());
+                    if (user.isPresent()) {
+                        filterChain.doFilter(servletRequest, servletResponse);
+                        return;
+                    }
+                } catch (DataProcessingException e) {
+                    LOGGER.warn("Can't authentificate user", e);
                 }
             }
         }
