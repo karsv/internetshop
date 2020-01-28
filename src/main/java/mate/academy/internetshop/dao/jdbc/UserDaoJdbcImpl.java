@@ -16,6 +16,7 @@ import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.lib.Inject;
+import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
 
@@ -57,9 +58,9 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
     @Override
     public Optional<User> findByToken(String token) throws DataProcessingException {
         String query = String.format("SELECT users.user_id AS userId, name, password, token, "
-                + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
-                + "ON users.user_id=user_roles.user_id "
-                + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
+                        + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
+                        + "ON users.user_id=user_roles.user_id "
+                        + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, token);
@@ -181,8 +182,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public boolean deleteById(Long userId) throws DataProcessingException {
+        if (bucketDao.getByUserId(userId).isPresent()) {
+            Bucket bucket = bucketDao.getByUserId(userId).get();
+            bucketDao.delete(bucket);
+        }
         deleteFromTableByUserId(userId, ORDERS_TABLE);
-        deleteFromTableByUserId(userId, BUCKETS_TABLE);
         deleteFromTableByUserId(userId, USER_ROLES_TABLE);
         deleteFromTableByUserId(userId, USER_TABLE);
         return true;

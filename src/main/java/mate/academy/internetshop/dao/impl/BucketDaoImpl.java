@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.db.Storage;
+import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.GeneratorId;
@@ -72,5 +73,10 @@ public class BucketDaoImpl implements BucketDao {
 
     @Override
     public void clear(Bucket bucket) {
+    }
+
+    @Override
+    public Optional<Bucket> getByUserId(Long userId) throws DataProcessingException {
+        return Optional.empty();
     }
 }

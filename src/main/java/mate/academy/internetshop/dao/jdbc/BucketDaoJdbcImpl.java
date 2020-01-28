@@ -85,34 +85,37 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
     }
 
     @Override
-    public Bucket update(Bucket bucket) throws DataProcessingException {
-        String query = String.format("DELETE FROM %s WHERE bucket_id=?",
-                BUCKET_ITEMS_TABLE);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, bucket.getBucketId());
-            preparedStatement.executeUpdate();
+    public Optional<Bucket> getByUserId(Long userId) throws DataProcessingException {
+        String query = String.format("SELECT bucket_id, user_id FROM %s WHERE user_id=?;",
+                BUCKET_TABLE);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, userId);
+            ResultSet resultSet = ps.executeQuery();
+            Bucket bucket = null;
+            if (resultSet.next()) {
+                bucket = new Bucket(resultSet.getLong(2));
+                bucket.setBucketId(resultSet.getLong(1));
+                bucket.setItems(getAllItemFromBucket(bucket.getBucketId()));
+                return Optional.of(bucket);
+            }
         } catch (SQLException e) {
-            throw new DataProcessingException("Can't update bucket, "
-                    + "due delete items by bucket_id in bucket_items", e);
+            throw new DataProcessingException("Can't get bucket by user ID", e);
         }
+        return Optional.empty();
+    }
 
+    @Override
+    public Bucket update(Bucket bucket) throws DataProcessingException {
+        clear(bucket);
         insertIntoBucketItemTable(bucket);
         return bucket;
     }
 
     @Override
     public boolean deleteById(Long bucketId) throws DataProcessingException {
+        clear(get(bucketId).get());
+
         String query = String.format("DELETE FROM %s WHERE bucket_id=?",
-                BUCKET_ITEMS_TABLE);
-
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, bucketId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete items at bucket_item by bucket_id", e);
-        }
-
-        query = String.format("DELETE FROM %s WHERE bucket_id=?",
                 BUCKET_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, bucketId);
