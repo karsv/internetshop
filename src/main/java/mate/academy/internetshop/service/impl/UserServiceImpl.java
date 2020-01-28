@@ -12,6 +12,7 @@ import mate.academy.internetshop.lib.Service;
 import mate.academy.internetshop.model.User;
 import mate.academy.internetshop.service.BucketService;
 import mate.academy.internetshop.service.UserService;
+import mate.academy.internetshop.util.HashUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -58,7 +59,8 @@ public class UserServiceImpl implements UserService {
     public User login(String login, String password) throws AuthentificationException,
             DataProcessingException {
         Optional<User> user = userDao.login(login);
-        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
+        if (user.isEmpty() || !user.get().getPassword().
+                equals(HashUtil.hashPassword(password, user.get().getSalt()))) {
             throw new AuthentificationException("Wrong authentification parameters!");
         }
         return user.get();
