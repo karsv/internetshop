@@ -89,16 +89,14 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    public User create(User entity) throws DataProcessingException {
-        User user = entity;
+    public User create(User user) throws DataProcessingException {
         String query = String.format("INSERT INTO %s(name, password, salt, token) VALUE(?, ?, ?, ?)",
                 USER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
-            byte[] salt= HashUtil.getSalt();
-            ps.setString(1, entity.getName());
-            ps.setString(2, HashUtil.hashPassword(entity.getPassword(), salt));
-            ps.setString(3, Base64.getEncoder().encodeToString(salt));
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, Base64.getEncoder().encodeToString(user.getSalt()));
             ps.setString(4, user.getToken());
             ps.executeUpdate();
             ResultSet resultSet = ps.getGeneratedKeys();

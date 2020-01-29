@@ -68,8 +68,19 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
     public Optional<Bucket> get(Long bucketId) throws DataProcessingException {
         String query = String.format("SELECT bucket_id, user_id FROM %s WHERE bucket_id=?;",
                 BUCKET_TABLE);
+        return getBucketByParameter(bucketId, query);
+    }
+
+    @Override
+    public Optional<Bucket> getByUserId(Long userId) throws DataProcessingException {
+        String query = String.format("SELECT bucket_id, user_id FROM %s WHERE user_id=?;",
+                BUCKET_TABLE);
+        return getBucketByParameter(userId, query);
+    }
+
+    private Optional<Bucket> getBucketByParameter(Long id, String query) throws DataProcessingException {
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, bucketId);
+            ps.setLong(1, id);
             ResultSet resultSet = ps.executeQuery();
             Bucket bucket = null;
             if (resultSet.next()) {
@@ -80,26 +91,6 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
             }
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get bucket by ID", e);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Bucket> getByUserId(Long userId) throws DataProcessingException {
-        String query = String.format("SELECT bucket_id, user_id FROM %s WHERE user_id=?;",
-                BUCKET_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, userId);
-            ResultSet resultSet = ps.executeQuery();
-            Bucket bucket = null;
-            if (resultSet.next()) {
-                bucket = new Bucket(resultSet.getLong(2));
-                bucket.setBucketId(resultSet.getLong(1));
-                bucket.setItems(getAllItemFromBucket(bucket.getBucketId()));
-                return Optional.of(bucket);
-            }
-        } catch (SQLException e) {
-            throw new DataProcessingException("Can't get bucket by user ID", e);
         }
         return Optional.empty();
     }

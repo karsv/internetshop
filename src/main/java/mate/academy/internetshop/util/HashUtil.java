@@ -31,11 +31,9 @@ public class HashUtil {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-512");
             messageDigest.update(salt);
             byte[] digest = messageDigest.digest(Base64.getDecoder().decode(password));
-            for (byte b:
-                 digest) {
+            for (byte b : digest) {
                 hashedPassword.append(b);
             }
-            System.out.println(Base64.getEncoder().encodeToString(salt));
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("trouble with hashing password", e);
         }
