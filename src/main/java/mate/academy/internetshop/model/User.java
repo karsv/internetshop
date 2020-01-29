@@ -7,12 +7,21 @@ public class User {
     private Long userId;
     private String name;
     private String password;
+    private byte[] salt;
     private String token;
     private Set<Role> roles  = new HashSet<>();
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
     }
 
     public String getToken() {

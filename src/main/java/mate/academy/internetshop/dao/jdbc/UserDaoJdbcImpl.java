@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -16,8 +17,10 @@ import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Dao;
 import mate.academy.internetshop.lib.Inject;
+import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
+import mate.academy.internetshop.util.HashUtil;
 
 @Dao
 public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
@@ -39,7 +42,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> login(String login) throws DataProcessingException {
-        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
+        String query = String.format("SELECT users.user_id AS userId, name, password, salt, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.user_id=user_roles.user_id "
                         + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.name=?",
@@ -56,10 +59,10 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> findByToken(String token) throws DataProcessingException {
-        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
-                + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
-                + "ON users.user_id=user_roles.user_id "
-                + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
+        String query = String.format("SELECT users.user_id AS userId, name, password, salt, token, "
+                        + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
+                        + "ON users.user_id=user_roles.user_id "
+                        + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, token);
@@ -76,6 +79,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
         while (rs.next()) {
             user = new User(rs.getString("name"), rs.getString("password"));
             user.setToken(rs.getString("token"));
+            user.setSalt(Base64.getDecoder().decode(rs.getString("salt")));
             user.setUserId(rs.getLong("userId"));
             Role role = new Role(Role.RoleName.valueOf(rs.getString("role")));
             role.setId(rs.getLong("idRole"));
@@ -85,15 +89,15 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    public User create(User entity) throws DataProcessingException {
-        User user = entity;
-        String query = String.format("INSERT INTO %s(name, password, token) VALUE(?, ?, ?)",
+    public User create(User user) throws DataProcessingException {
+        String query = String.format("INSERT INTO %s(name, password, salt, token) VALUE(?, ?, ?, ?)",
                 USER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, entity.getName());
-            ps.setString(2, entity.getPassword());
-            ps.setString(3, entity.getToken());
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, Base64.getEncoder().encodeToString(user.getSalt()));
+            ps.setString(4, user.getToken());
             ps.executeUpdate();
             ResultSet resultSet = ps.getGeneratedKeys();
             while (resultSet.next()) {
@@ -137,7 +141,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public Optional<User> get(Long userId) throws DataProcessingException {
-        String query = String.format("SELECT users.user_id AS userId, name, password, token, "
+        String query = String.format("SELECT users.user_id AS userId, name, password, salt, token, "
                         + "roles.role_name AS role, roles.id AS idRole FROM %s INNER JOIN %s "
                         + "ON users.user_id=user_roles.user_id "
                         + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.user_id=?",
@@ -155,12 +159,13 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
     @Override
     public User update(User user) throws DataProcessingException {
         User newUser = user;
-        String query = String.format("UPDATE %s(name, password, token) VALUE(?, ?, ?)",
+        String query = String.format("UPDATE %s(name, password, salt, token) VALUE(?, ?, ?, ?)",
                 USER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, user.getName());
             ps.setString(2, user.getPassword());
-            ps.setString(3, user.getToken());
+            ps.setString(3, Base64.getEncoder().encodeToString(user.getSalt()));
+            ps.setString(4, user.getToken());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataProcessingException("Can't update user", e);
@@ -181,8 +186,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public boolean deleteById(Long userId) throws DataProcessingException {
+        if (bucketDao.getByUserId(userId).isPresent()) {
+            Bucket bucket = bucketDao.getByUserId(userId).get();
+            bucketDao.delete(bucket);
+        }
         deleteFromTableByUserId(userId, ORDERS_TABLE);
-        deleteFromTableByUserId(userId, BUCKETS_TABLE);
         deleteFromTableByUserId(userId, USER_ROLES_TABLE);
         deleteFromTableByUserId(userId, USER_TABLE);
         return true;
@@ -217,8 +225,10 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                 String name = resultSet.getString("name");
                 String password = resultSet.getString("password");
                 User user = new User(name, password);
+                user.setSalt(Base64.getDecoder().decode(resultSet.getString("salt")));
                 user.setUserId(id);
                 user.setRoles(getUserRoles(user));
+
                 list.add(user);
             }
         } catch (SQLException e) {
