@@ -1,6 +1,5 @@
 package mate.academy.internetshop.service.impl;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(User user) throws DataProcessingException {
         User newUser = user;
-        byte[] salt= HashUtil.getSalt();
+        byte[] salt = HashUtil.getSalt();
         newUser.setPassword(HashUtil.hashPassword(user.getPassword(), salt));
         newUser.setSalt(salt);
         newUser.setToken(getToken());
@@ -64,8 +63,8 @@ public class UserServiceImpl implements UserService {
     public User login(String login, String password) throws AuthentificationException,
             DataProcessingException {
         Optional<User> user = userDao.login(login);
-        if (user.isEmpty() || !user.get().getPassword().
-                equals(HashUtil.hashPassword(password, user.get().getSalt()))) {
+        if (user.isEmpty() || !user.get().getPassword()
+                .equals(HashUtil.hashPassword(password, user.get().getSalt()))) {
             throw new AuthentificationException("Wrong authentification parameters!");
         }
         return user.get();

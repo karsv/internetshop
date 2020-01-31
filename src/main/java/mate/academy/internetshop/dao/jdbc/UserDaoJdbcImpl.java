@@ -20,7 +20,6 @@ import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.model.Bucket;
 import mate.academy.internetshop.model.Role;
 import mate.academy.internetshop.model.User;
-import mate.academy.internetshop.util.HashUtil;
 
 @Dao
 public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
@@ -90,7 +89,8 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public User create(User user) throws DataProcessingException {
-        String query = String.format("INSERT INTO %s(name, password, salt, token) VALUE(?, ?, ?, ?)",
+        String query = String.format("INSERT INTO %s(name, password, salt, token) "
+                        + "VALUE(?, ?, ?, ?)",
                 USER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {

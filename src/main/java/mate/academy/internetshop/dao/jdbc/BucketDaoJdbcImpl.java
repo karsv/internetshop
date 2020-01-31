@@ -78,7 +78,8 @@ public class BucketDaoJdbcImpl extends AbstractDao<Bucket> implements BucketDao 
         return getBucketByParameter(userId, query);
     }
 
-    private Optional<Bucket> getBucketByParameter(Long id, String query) throws DataProcessingException {
+    private Optional<Bucket> getBucketByParameter(Long id, String query)
+            throws DataProcessingException {
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, id);
             ResultSet resultSet = ps.executeQuery();

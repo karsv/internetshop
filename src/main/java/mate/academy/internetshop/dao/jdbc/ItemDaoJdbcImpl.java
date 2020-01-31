@@ -72,35 +72,25 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public boolean deleteById(Long longId) throws DataProcessingException {
-        Optional<Item> item = get(longId);
+    public boolean deleteById(Long itemId) throws DataProcessingException {
+        Optional<Item> item = get(itemId);
         if (item.isPresent()) {
-            String query = String.format("DELETE FROM %s WHERE item_id=?", BUCKET_ITEM_TABLE);
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setLong(1, longId);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't delete item by id in bucket_item", e);
-            }
-
-            query = String.format("DELETE FROM %s WHERE item_id=?", ORDER_ITEM_TABLE);
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setLong(1, longId);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't delete item by id in order_item", e);
-            }
-
-            query = String.format("DELETE FROM %s WHERE item_id=?", ITEMS_TABLE);
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setLong(1, longId);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new DataProcessingException("Can't delete item by id", e);
-            }
+            deleteItemFromTableById(BUCKET_ITEM_TABLE, itemId);
+            deleteItemFromTableById(ORDER_ITEM_TABLE, itemId);
+            deleteItemFromTableById(ITEMS_TABLE, itemId);
             return true;
         }
         return false;
+    }
+
+    private void deleteItemFromTableById(String table, Long itemId) throws DataProcessingException {
+        String query = String.format("DELETE FROM %s WHERE item_id=?", table);
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, itemId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataProcessingException("Can't delete item by id in " + table, e);
+        }
     }
 
     @Override

@@ -74,19 +74,11 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
 
     @Override
     public Order update(Order order) throws DataProcessingException {
-        String query = String.format("DELETE FROM %s WHERE order_id=?",
-                ORDER_ITEMS_TABLE);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, order.getOrderId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataProcessingException(
-                    "Can't delete orders items due update from order_items", e);
-        }
+        deleteOrderFromTableById(ORDER_ITEMS_TABLE, order.getOrderId());
 
         insertIntoOrderItemTable(order);
 
-        query = String.format("UPDATE %s SET amount=(?) WHERE order_id=?",
+        String query = String.format("UPDATE %s SET amount=(?) WHERE order_id=?",
                 ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setBigDecimal(1, order.getAmount());
@@ -115,24 +107,20 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
 
     @Override
     public boolean deleteById(Long orderId) throws DataProcessingException {
-        String query = String.format("DELETE FROM %s WHERE order_id =?",
-                ORDER_ITEMS_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, orderId);
-            int rows = ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete orders items due delete "
-                    + "Order from order_items", e);
-        }
+        deleteOrderFromTableById(ORDER_ITEMS_TABLE, orderId);
+        deleteOrderFromTableById(ORDER_TABLE, orderId);
+        return true;
+    }
 
-        query = String.format("DELETE FROM %s WHERE order_id =?",
-                ORDER_TABLE);
+    private void deleteOrderFromTableById(String table, Long orderId)
+            throws DataProcessingException {
+        String query = String.format("DELETE FROM %s WHERE order_id =?",
+                table);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, orderId);
             int rows = ps.executeUpdate();
-            return true;
         } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete order", e);
+            throw new DataProcessingException("Can't delete order from" + table, e);
         }
     }
 
