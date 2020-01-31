@@ -14,7 +14,7 @@ public interface GenericService<T, N> {
 
     List<T> getAll() throws DataProcessingException;
 
-    boolean deleteById(N entityId) throws DataProcessingException;
+    void deleteById(N entityId) throws DataProcessingException;
 
-    boolean delete(T entity) throws DataProcessingException;
+    void delete(T entity) throws DataProcessingException;
 }

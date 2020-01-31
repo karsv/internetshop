@@ -1,6 +1,5 @@
 package mate.academy.internetshop.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,13 +39,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean deleteById(Long orderId) throws DataProcessingException {
-        return orderDao.deleteById(orderId);
+    public void deleteById(Long orderId) throws DataProcessingException {
+        orderDao.deleteById(orderId);
     }
 
     @Override
-    public boolean delete(Order order) throws DataProcessingException {
-        return orderDao.delete(order);
+    public void delete(Order order) throws DataProcessingException {
+        orderDao.delete(order);
     }
 
     @Override
@@ -57,12 +56,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getUserOrders(User user) throws DataProcessingException {
-        List<Order> orderList = new ArrayList<>();
-        for (Order order : orderDao.getAll()) {
-            if (order.getUserId().equals(user.getUserId())) {
-                orderList.add(order);
-            }
-        }
-        return orderList;
+        return orderDao.getAllOrdersByUserId(user.getUserId());
     }
 }

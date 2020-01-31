@@ -89,8 +89,6 @@ At internetshop.factory.Factory class use username, password and name of DB to c
 
 Change a path in internetshop.src.main.resources.log4j.properties. It has to reach your logFile.
 
-Optionally, use internetshop.controller.InjectDataController, if you want to initialize any models at the app. 
-
 Be careful the foreign key option for order_id at the order_item table is cascade on delete. 
 
 Run the project.

@@ -10,7 +10,5 @@ public interface UserService extends GenericService<User, Long> {
     User login(String login, String password) throws AuthentificationException,
             DataProcessingException;
 
-    String getToken();
-
     Optional<User> findByToken(String token) throws DataProcessingException;
 }

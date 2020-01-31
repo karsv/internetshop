@@ -15,9 +15,9 @@ import mate.academy.internetshop.model.Item;
 
 @Dao
 public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
-    private static String ITEMS_TABLE = "items";
-    private static String BUCKET_ITEM_TABLE = "bucket_item";
-    private static String ORDER_ITEM_TABLE = "order_items";
+    private static final String ITEMS_TABLE = "items";
+    private static final String BUCKET_ITEM_TABLE = "bucket_item";
+    private static final String ORDER_ITEM_TABLE = "order_items";
 
     public ItemDaoJdbcImpl(Connection connection) {
         super(connection);
@@ -45,7 +45,7 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, itemId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 Item item = new Item(rs.getString("name"),
                         rs.getBigDecimal("price"));
                 item.setItemId(rs.getLong("item_id"));
@@ -72,15 +72,10 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public boolean deleteById(Long itemId) throws DataProcessingException {
-        Optional<Item> item = get(itemId);
-        if (item.isPresent()) {
-            deleteItemFromTableById(BUCKET_ITEM_TABLE, itemId);
-            deleteItemFromTableById(ORDER_ITEM_TABLE, itemId);
-            deleteItemFromTableById(ITEMS_TABLE, itemId);
-            return true;
-        }
-        return false;
+    public void deleteById(Long itemId) throws DataProcessingException {
+        deleteItemFromTableById(BUCKET_ITEM_TABLE, itemId);
+        deleteItemFromTableById(ORDER_ITEM_TABLE, itemId);
+        deleteItemFromTableById(ITEMS_TABLE, itemId);
     }
 
     private void deleteItemFromTableById(String table, Long itemId) throws DataProcessingException {
@@ -94,8 +89,8 @@ public class ItemDaoJdbcImpl extends AbstractDao<Item> implements ItemDao {
     }
 
     @Override
-    public boolean delete(Item entity) throws DataProcessingException {
-        return deleteById(entity.getItemId());
+    public void delete(Item entity) throws DataProcessingException {
+        deleteById(entity.getItemId());
     }
 
     @Override
