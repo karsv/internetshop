@@ -81,9 +81,7 @@ add sdk 11.0.3;
 
 Add sdk 11.0.3 in project struсture.
 
-Create a schema "internet_shop" in any SQL database.
-
-Use file internetshop.src.main.resources.init_db.sql to create all the tables required by this app.
+Use file internetshop.src.main.resources.init_db.sql to create the schema and all tables required by this app.
 
 At internetshop.factory.Factory class use username, password and name of DB to create a Connection.
 
