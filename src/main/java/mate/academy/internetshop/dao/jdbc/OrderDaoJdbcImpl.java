@@ -18,9 +18,9 @@ import mate.academy.internetshop.model.Order;
 
 @Dao
 public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
-    private static String ORDER_TABLE = "orders";
-    private static String ORDER_ITEMS_TABLE = "order_items";
-    private static String ITEMS_TABLE = "items";
+    private static final String ORDER_TABLE = "orders";
+    private static final String ORDER_ITEMS_TABLE = "order_items";
+    private static final String ITEMS_TABLE = "items";
 
     public OrderDaoJdbcImpl(Connection connection) {
         super(connection);
@@ -34,7 +34,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, newOrder.getUserId());
             ps.setBigDecimal(2, newOrder.getAmount());
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     newOrder.setOrderId(generatedKeys.getLong(1));
@@ -74,24 +74,16 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
 
     @Override
     public Order update(Order order) throws DataProcessingException {
-        String query = String.format("DELETE FROM %s WHERE order_id=?",
-                ORDER_ITEMS_TABLE);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, order.getOrderId());
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataProcessingException(
-                    "Can't delete orders items due update from order_items", e);
-        }
+        deleteOrderFromTableById(ORDER_ITEMS_TABLE, order.getOrderId());
 
         insertIntoOrderItemTable(order);
 
-        query = String.format("UPDATE %s SET amount=(?) WHERE order_id=?",
+        String query = String.format("UPDATE %s SET amount=(?) WHERE order_id=?",
                 ORDER_TABLE);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setBigDecimal(1, order.getAmount());
             ps.setLong(2, order.getOrderId());
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataProcessingException("Can't update order", e);
         }
@@ -105,7 +97,7 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
             try (PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setLong(1, order.getOrderId());
                 ps.setLong(2, item.getItemId());
-                int rows = ps.executeUpdate();
+                ps.executeUpdate();
             } catch (SQLException e) {
                 throw new DataProcessingException(
                         "Can't insert new items to order_items", e);
@@ -114,31 +106,26 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
     }
 
     @Override
-    public boolean deleteById(Long orderId) throws DataProcessingException {
-        String query = String.format("DELETE FROM %s WHERE order_id =?",
-                ORDER_ITEMS_TABLE);
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setLong(1, orderId);
-            int rows = ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete orders items due delete "
-                    + "Order from order_items", e);
-        }
+    public void deleteById(Long orderId) throws DataProcessingException {
+        deleteOrderFromTableById(ORDER_ITEMS_TABLE, orderId);
+        deleteOrderFromTableById(ORDER_TABLE, orderId);
+    }
 
-        query = String.format("DELETE FROM %s WHERE order_id =?",
-                ORDER_TABLE);
+    private void deleteOrderFromTableById(String table, Long orderId)
+            throws DataProcessingException {
+        String query = String.format("DELETE FROM %s WHERE order_id =?",
+                table);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setLong(1, orderId);
-            int rows = ps.executeUpdate();
-            return true;
+            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataProcessingException("Can't delete order", e);
+            throw new DataProcessingException("Can't delete order from" + table, e);
         }
     }
 
     @Override
-    public boolean delete(Order order) throws DataProcessingException {
-        return deleteById(order.getOrderId());
+    public void delete(Order order) throws DataProcessingException {
+        deleteById(order.getOrderId());
     }
 
     @Override
@@ -153,6 +140,35 @@ public class OrderDaoJdbcImpl extends AbstractDao<Order> implements OrderDao {
                 Long orderId = resultSet.getLong(1);
                 Long userId = resultSet.getLong(2);
                 BigDecimal amount = resultSet.getBigDecimal(3);
+                Order order = new Order();
+                order.setOrderId(orderId);
+                order.setUserId(userId);
+                order.setAmount(amount);
+                order.setItems(getAllItemFromOrder(orderId));
+                tempOrders.add(order);
+            }
+        } catch (SQLException e) {
+            throw new DataProcessingException("Can't get all orders", e);
+        }
+
+        List<Order> orders = new ArrayList<>();
+        for (Order order : tempOrders) {
+            orders.add(get(order.getOrderId()).get());
+        }
+        return orders;
+    }
+
+    @Override
+    public List<Order> getAllOrdersByUserId(Long userId) throws DataProcessingException {
+        List<Order> tempOrders = new ArrayList<>();
+        String query = String.format("SELECT order_id, amount FROM %s WHERE user_id=?",
+                ORDER_TABLE);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, userId);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                Long orderId = resultSet.getLong(1);
+                BigDecimal amount = resultSet.getBigDecimal(2);
                 Order order = new Order();
                 order.setOrderId(orderId);
                 order.setUserId(userId);

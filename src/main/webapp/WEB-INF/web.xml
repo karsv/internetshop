@@ -14,6 +14,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>index</servlet-name>
+        <url-pattern>/</url-pattern>
         <url-pattern>/index</url-pattern>
     </servlet-mapping>
 
@@ -42,15 +43,6 @@
     <servlet-mapping>
         <servlet-name>deleteItem</servlet-name>
         <url-pattern>/servlet/deleteItem</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>add</servlet-name>
-        <servlet-class>mate.academy.internetshop.controller.InjectDataController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>add</servlet-name>
-        <url-pattern>/add</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -163,7 +155,7 @@
 
     <filter>
         <filter-name>auth-filter</filter-name>
-        <filter-class>mate.academy.internetshop.web.AuthentificationFilter</filter-class>
+        <filter-class>mate.academy.internetshop.filter.AuthenticationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>auth-filter</filter-name>
@@ -172,7 +164,7 @@
 
     <filter>
         <filter-name>role-filter</filter-name>
-        <filter-class>mate.academy.internetshop.web.AuthorizationFilter</filter-class>
+        <filter-class>mate.academy.internetshop.filter.AuthorizationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>role-filter</filter-name>

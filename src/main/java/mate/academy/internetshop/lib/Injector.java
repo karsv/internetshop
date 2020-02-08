@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Injector {
     private static final String PROJECT_MAIN_PACKAGE = "mate.academy.internetshop";
-    public static final Logger LOGGER = LogManager.getLogger(Injector.class);
+    private static final Logger LOGGER = LogManager.getLogger(Injector.class);
     private static List<Class> classes = new ArrayList<>();
 
     static {

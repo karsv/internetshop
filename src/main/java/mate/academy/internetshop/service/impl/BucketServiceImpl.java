@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import mate.academy.internetshop.dao.BucketDao;
-import mate.academy.internetshop.dao.ItemDao;
 import mate.academy.internetshop.exceptions.DataProcessingException;
 import mate.academy.internetshop.lib.Inject;
 import mate.academy.internetshop.lib.Service;
@@ -18,9 +17,6 @@ public class BucketServiceImpl implements BucketService {
     @Inject
     private static BucketDao bucketDao;
 
-    @Inject
-    private static ItemDao itemDao;
-
     @Override
     public Bucket create(Bucket bucket) throws DataProcessingException {
         return bucketDao.create(bucket);
@@ -28,8 +24,7 @@ public class BucketServiceImpl implements BucketService {
 
     @Override
     public Optional<Bucket> get(Long bucketId) throws DataProcessingException {
-        Optional<Bucket> bucket = bucketDao.get(bucketId);
-        return bucket;
+        return bucketDao.get(bucketId);
     }
 
     @Override
@@ -43,13 +38,13 @@ public class BucketServiceImpl implements BucketService {
     }
 
     @Override
-    public boolean deleteById(Long bucketId) throws DataProcessingException {
-        return bucketDao.deleteById(bucketId);
+    public void deleteById(Long bucketId) throws DataProcessingException {
+        bucketDao.deleteById(bucketId);
     }
 
     @Override
-    public boolean delete(Bucket bucket) throws DataProcessingException {
-        return bucketDao.delete(bucket);
+    public void delete(Bucket bucket) throws DataProcessingException {
+        bucketDao.delete(bucket);
     }
 
     @Override
@@ -75,18 +70,10 @@ public class BucketServiceImpl implements BucketService {
 
     @Override
     public Bucket getByUserId(Long userId) throws DataProcessingException {
-        List<Bucket> list = bucketDao.getAll();
-        Optional<Bucket> bucket = bucketDao.getAll().stream()
-                .filter(x -> x.getUserId().equals(userId))
-                .findFirst();
+        Optional<Bucket> bucket = bucketDao.getByUserId(userId);
         if (bucket.isPresent()) {
             return bucket.get();
         }
         return create(new Bucket(userId));
-    }
-
-    @Override
-    public List<Item> getAllItems(Bucket bucket) throws DataProcessingException {
-        return bucketDao.get(bucket.getBucketId()).get().getItems();
     }
 }

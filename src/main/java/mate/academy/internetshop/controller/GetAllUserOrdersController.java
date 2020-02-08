@@ -31,8 +31,7 @@ public class GetAllUserOrdersController extends HttpServlet {
             throws ServletException, IOException {
         try {
             Long userId = (Long) req.getSession().getAttribute("userId");
-            User user = null;
-            user = userService.get(userId).get();
+            User user = userService.get(userId).get();
             List<Order> orderList = orderService.getUserOrders(user);
             req.setAttribute("orders", orderList);
         } catch (DataProcessingException e) {

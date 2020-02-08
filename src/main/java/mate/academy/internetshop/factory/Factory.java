@@ -35,9 +35,9 @@ public class Factory {
     private static BucketService bucketServiceInstance;
 
     private static Connection connection;
-    private static String DB_NAME = "internet_shop";
-    private static String USER = "root";
-    private static String PASSWORD = "123qwe";
+    private static final String DB_NAME = "internet_shop";
+    private static final String USER = "root";
+    private static final String PASSWORD = "123qwe";
 
     private static final Logger LOGGER = LogManager.getLogger(Factory.class);
 

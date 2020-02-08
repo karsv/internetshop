@@ -1,4 +1,4 @@
-package mate.academy.internetshop.web;
+package mate.academy.internetshop.filter;
 
 import static mate.academy.internetshop.model.Role.RoleName.ADMIN;
 import static mate.academy.internetshop.model.Role.RoleName.USER;
@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 public class AuthorizationFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(AuthorizationFilter.class);
     private Map<String, Role.RoleName> protectedUrls = new HashMap<>();
-    private static final String COOKIE = "MATE";
 
     @Inject
     private static UserService userService;
@@ -70,9 +69,8 @@ public class AuthorizationFilter implements Filter {
         if (verifyRole(user, roleName)) {
             filterChain.doFilter(req, resp);
             return;
-        } else {
-            processDenied(req, resp);
         }
+        processDenied(req, resp);
     }
 
     @Override

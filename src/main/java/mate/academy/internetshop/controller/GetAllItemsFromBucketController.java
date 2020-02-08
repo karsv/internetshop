@@ -1,6 +1,7 @@
 package mate.academy.internetshop.controller;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +26,7 @@ public class GetAllItemsFromBucketController extends HttpServlet {
             throws ServletException, IOException {
         try {
             Long userId = (Long) req.getSession().getAttribute("userId");
-            Bucket bucket = null;
-            bucket = bucketService.getByUserId(userId);
+            Bucket bucket = bucketService.getByUserId(userId);
             bucketService.update(bucket);
             req.setAttribute("bucket", bucket);
         } catch (DataProcessingException e) {

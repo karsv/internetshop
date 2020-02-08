@@ -5,13 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-import mate.academy.internetshop.dao.BucketDao;
-import mate.academy.internetshop.dao.UserDao;
-import mate.academy.internetshop.exceptions.DataProcessingException;
-import mate.academy.internetshop.lib.Inject;
-import mate.academy.internetshop.model.User;
-import mate.academy.internetshop.service.BucketService;
-import mate.academy.internetshop.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

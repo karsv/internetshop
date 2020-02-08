@@ -1,4 +1,4 @@
-package mate.academy.internetshop.web;
+package mate.academy.internetshop.filter;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import mate.academy.internetshop.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AuthentificationFilter implements Filter {
+public class AuthenticationFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger(AuthorizationFilter.class);
     private static final String COOKIE = "MATE";
 
@@ -38,15 +38,14 @@ public class AuthentificationFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         if (req.getCookies() == null) {
-            processAuthentificated(req, resp);
+            processAuthenticated(req, resp);
             return;
         }
 
         for (Cookie cookie : req.getCookies()) {
             if (cookie.getName().equals(COOKIE)) {
-                Optional<User> user = null;
                 try {
-                    user = userService.findByToken(cookie.getValue());
+                    Optional<User> user = userService.findByToken(cookie.getValue());
                     if (user.isPresent()) {
                         filterChain.doFilter(servletRequest, servletResponse);
                         return;
@@ -56,14 +55,14 @@ public class AuthentificationFilter implements Filter {
                 }
             }
         }
-        processAuthentificated(req, resp);
+        processAuthenticated(req, resp);
     }
 
     @Override
     public void destroy() {
     }
 
-    private void processAuthentificated(HttpServletRequest req, HttpServletResponse resp)
+    private void processAuthenticated(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.sendRedirect(req.getContextPath() + "/login");
     }

@@ -7,9 +7,6 @@
 </head>
 <body>
 <br>
-<a href="${pageContext.request.contextPath}/add">Initial Add</a>
-</br>
-<br>
 <a href="${pageContext.request.contextPath}/servlet/addItem">Add Item</a>
 </br>
 <br>

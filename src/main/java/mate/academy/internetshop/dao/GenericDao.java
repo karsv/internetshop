@@ -12,9 +12,9 @@ public interface GenericDao<T, N> {
 
     T update(T entity) throws DataProcessingException;
 
-    boolean deleteById(N entityId) throws DataProcessingException;
+    void deleteById(N entityId) throws DataProcessingException;
 
-    boolean delete(T entity) throws DataProcessingException;
+    void delete(T entity) throws DataProcessingException;
 
     List<T> getAll() throws DataProcessingException;
 }
