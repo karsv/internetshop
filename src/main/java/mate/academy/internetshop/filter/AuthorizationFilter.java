@@ -64,7 +64,7 @@ public class AuthorizationFilter implements Filter {
         try {
             user = userService.get(userId).get();
         } catch (DataProcessingException e) {
-            LOGGER.warn("Can't authorizate user", e);
+            LOGGER.warn("Can't authorize user", e);
         }
         if (verifyRole(user, roleName)) {
             filterChain.doFilter(req, resp);

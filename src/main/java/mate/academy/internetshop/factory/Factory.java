@@ -45,7 +45,8 @@ public class Factory {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME + "?"
-                    + "user=" + USER + "&password=" + PASSWORD);
+                    + "user=" + USER + "&password=" + PASSWORD
+                    + "&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
         } catch (ClassNotFoundException | SQLException e) {
             LOGGER.error("Can't connect to db", e);
         }

@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userDao.login(login);
         if (user.isEmpty() || !user.get().getPassword()
                 .equals(HashUtil.hashPassword(password, user.get().getSalt()))) {
-            throw new AuthentificationException("Wrong authentification parameters!");
+            throw new AuthentificationException("Wrong authentication parameters!");
         }
         return user.get();
     }
