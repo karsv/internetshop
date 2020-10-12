@@ -42,7 +42,7 @@ public class LoginController extends HttpServlet {
             httpSession.setAttribute("userId", user.getUserId());
             resp.sendRedirect(req.getContextPath() + "/index");
         } catch (AuthentificationException e) {
-            req.setAttribute("errorMsg", "Wrong parameters!");
+            req.setAttribute("errorMsg", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
         } catch (DataProcessingException e) {
             LOGGER.error("Can't login user", e);

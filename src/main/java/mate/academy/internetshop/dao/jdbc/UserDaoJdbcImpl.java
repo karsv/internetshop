@@ -1,16 +1,7 @@
 package mate.academy.internetshop.dao.jdbc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import java.sql.*;
+import java.util.*;
 import mate.academy.internetshop.dao.BucketDao;
 import mate.academy.internetshop.dao.UserDao;
 import mate.academy.internetshop.exceptions.DataProcessingException;
@@ -42,7 +33,7 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                         + "ON users.user_id=user_roles.user_id "
                         + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.name=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
-        return Optional.of(getUserByParameter(query, login));
+        return getUserOptional(getUserByParameter(query, login));
     }
 
     @Override
@@ -52,8 +43,11 @@ public class UserDaoJdbcImpl extends AbstractDao<User> implements UserDao {
                         + "ON users.user_id=user_roles.user_id "
                         + "INNER JOIN %s ON user_roles.role_id = roles.id WHERE users.token=?",
                 USER_TABLE, USER_ROLES_TABLE, ROLES_TABLE);
+        return getUserOptional(getUserByParameter(query, token));
+    }
 
-        return Optional.of(getUserByParameter(query, token));
+    private Optional<User> getUserOptional(User user) {
+        return user != null ? Optional.of(user) : Optional.empty();
     }
 
     private User getUserByParameter(String query, String paramater)

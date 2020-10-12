@@ -56,12 +56,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(String login, String password) throws AuthentificationException,
             DataProcessingException {
-        Optional<User> user = userDao.login(login);
-        if (user.isEmpty() || !user.get().getPassword()
-                .equals(HashUtil.hashPassword(password, user.get().getSalt()))) {
-            throw new AuthentificationException("Wrong authentication parameters!");
-        }
-        return user.get();
+        User user = userDao.login(login)
+                .orElseThrow(() -> new AuthentificationException("Wrong authentication parameters!"));
+        return user;
     }
 
     private String getToken() {
